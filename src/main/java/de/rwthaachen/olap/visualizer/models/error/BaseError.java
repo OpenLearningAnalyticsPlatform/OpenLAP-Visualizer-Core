@@ -6,7 +6,7 @@ package de.rwthaachen.olap.visualizer.models.error;
  */
 public class BaseError {
 
-    private String httpStatusCode; // the HTTP status code of the error
+    private String statusCode; // the internal status code of the error
     private String errorMessage; // a human readable message summarizing the cause of the error
     private String moreInfoURL; // a url pointing to more information on the error
     private String apiVersionNumber; // representing the current version number of the API that the System is running on
@@ -14,19 +14,19 @@ public class BaseError {
     public BaseError() {
     }
 
-    public BaseError(String httpStatusCode, String errorMessage, String moreInfoURL, String apiVersionNumber) {
-        this.httpStatusCode = httpStatusCode;
+    public BaseError(String statusCode, String errorMessage, String moreInfoURL, String apiVersionNumber) {
+        this.statusCode = statusCode;
         this.errorMessage = errorMessage;
         this.moreInfoURL = moreInfoURL;
         this.apiVersionNumber = apiVersionNumber;
     }
 
-    public String getHttpStatusCode() {
-        return httpStatusCode;
+    public String getStatusCode() {
+        return statusCode;
     }
 
-    public void setHttpStatusCode(String httpStatusCode) {
-        this.httpStatusCode = httpStatusCode;
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
     }
 
     public String getErrorMessage() {

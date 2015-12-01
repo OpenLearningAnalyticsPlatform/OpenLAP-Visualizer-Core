@@ -12,7 +12,7 @@ public class VisualizationEngineController {
 
     @RequestMapping(value = "/generateVisualizationCode", method = RequestMethod.POST)
     public Response generateVisualizationCode(@RequestBody Request requestBody) {
-
+        return new Response();
     }
 
 }

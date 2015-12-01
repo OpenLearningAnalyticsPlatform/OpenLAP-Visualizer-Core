@@ -13,21 +13,25 @@ public class VisualizationSuggestionsController {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Response visualizationSuggestionsForAnalyticsMethod(@RequestParam(value = "methodName", defaultValue = "") String analyticsMethod, @RequestParam(value = "methodCategory", defaultValue = "") String analyticsMethodCategory) {
+        return new Response();
 
     }
 
     @RequestMapping(value = "/{idOfSuggestion}/update", method = RequestMethod.PUT)
     public Response updateVisualizationSuggestion(@RequestBody Request requestbody) {
+        return new Response();
 
     }
 
     @RequestMapping(value = "/{idOfSuggestion}/delete", method = RequestMethod.DELETE)
     public Response deleteVisualizationSuggestion() {
+        return new Response();
 
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public Response createVisualizationSuggestion(@RequestBody Request requestBody) {
+        return new Response();
 
     }
 }

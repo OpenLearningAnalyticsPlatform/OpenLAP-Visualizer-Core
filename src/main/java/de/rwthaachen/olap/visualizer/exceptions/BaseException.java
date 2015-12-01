@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
  */
 public abstract class BaseException extends RuntimeException{
 
-    public abstract HttpStatus getHTTPStatusCode ();
+    public abstract String getLocalStatusCode();
 
     protected BaseException(String message){
         super(message);

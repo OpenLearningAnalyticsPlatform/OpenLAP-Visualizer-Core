@@ -7,4 +7,3 @@ import de.rwthaachen.olap.visualizer.models.response.Response;
  */
 public class UpdateVisualizationFrameworkResponse extends Response {
 }
-y

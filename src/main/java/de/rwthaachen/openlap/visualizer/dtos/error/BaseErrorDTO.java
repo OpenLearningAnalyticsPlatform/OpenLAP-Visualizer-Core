@@ -1,7 +1,7 @@
-package de.rwthaachen.olap.visualizer.dtos.error;
+package de.rwthaachen.openlap.visualizer.dtos.error;
 
-import de.rwthaachen.olap.visualizer.Application;
-import de.rwthaachen.olap.visualizer.exceptions.BaseException;
+import de.rwthaachen.openlap.visualizer.Application;
+import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
 
 import java.time.LocalDateTime;
 

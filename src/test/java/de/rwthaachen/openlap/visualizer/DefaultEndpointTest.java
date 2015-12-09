@@ -1,8 +1,8 @@
-package de.rwthaachen.olap.visualizer;
+package de.rwthaachen.openlap.visualizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwthaachen.olap.visualizer.controller.DefaultController;
-import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
+import de.rwthaachen.openlap.visualizer.controller.DefaultController;
+import de.rwthaachen.openlap.visualizer.dtos.request.RequestDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

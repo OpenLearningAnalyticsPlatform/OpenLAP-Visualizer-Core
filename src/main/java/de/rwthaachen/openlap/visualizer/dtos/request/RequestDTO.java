@@ -1,4 +1,4 @@
-package de.rwthaachen.olap.visualizer.dtos.request;
+package de.rwthaachen.openlap.visualizer.dtos.request;
 
 /**
  * The super class of all the requests sent by the Modular Visualization Framework.

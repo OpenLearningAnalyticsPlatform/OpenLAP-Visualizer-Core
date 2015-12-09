@@ -1,4 +1,4 @@
-package de.rwthaachen.olap.visualizer.dtos.response;
+package de.rwthaachen.openlap.visualizer.dtos.response;
 
 /**
  * The super class of all the responses sent back by the Modular Visualization Framework.

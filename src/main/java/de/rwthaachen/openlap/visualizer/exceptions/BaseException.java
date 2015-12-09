@@ -1,4 +1,4 @@
-package de.rwthaachen.olap.visualizer.exceptions;
+package de.rwthaachen.openlap.visualizer.exceptions;
 
 /**
  * All the exceptions should extend this base error and add their relevant

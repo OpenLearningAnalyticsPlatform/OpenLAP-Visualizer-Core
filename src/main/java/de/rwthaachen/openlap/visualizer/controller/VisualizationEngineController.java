@@ -1,7 +1,7 @@
-package de.rwthaachen.olap.visualizer.controller;
+package de.rwthaachen.openlap.visualizer.controller;
 
-import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
-import de.rwthaachen.olap.visualizer.dtos.response.ResponseDTO;
+import de.rwthaachen.openlap.visualizer.dtos.request.RequestDTO;
+import de.rwthaachen.openlap.visualizer.dtos.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 /**

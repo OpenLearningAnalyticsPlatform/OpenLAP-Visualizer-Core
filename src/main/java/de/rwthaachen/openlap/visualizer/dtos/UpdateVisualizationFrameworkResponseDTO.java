@@ -1,6 +1,6 @@
-package de.rwthaachen.olap.visualizer.dtos;
+package de.rwthaachen.openlap.visualizer.dtos;
 
-import de.rwthaachen.olap.visualizer.dtos.response.ResponseDTO;
+import de.rwthaachen.openlap.visualizer.dtos.response.ResponseDTO;
 
 /**
  * Created by bas on 11/17/15.

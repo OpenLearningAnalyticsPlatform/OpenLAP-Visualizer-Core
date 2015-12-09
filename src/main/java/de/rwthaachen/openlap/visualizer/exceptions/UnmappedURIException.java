@@ -1,4 +1,4 @@
-package de.rwthaachen.olap.visualizer.exceptions;
+package de.rwthaachen.openlap.visualizer.exceptions;
 
 public class UnmappedURIException extends BaseException {
 

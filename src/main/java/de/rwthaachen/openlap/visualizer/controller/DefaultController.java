@@ -1,8 +1,8 @@
-package de.rwthaachen.olap.visualizer.controller;
+package de.rwthaachen.openlap.visualizer.controller;
 
-import de.rwthaachen.olap.visualizer.exceptions.UnmappedURIException;
-import de.rwthaachen.olap.visualizer.dtos.error.BaseErrorDTO;
-import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
+import de.rwthaachen.openlap.visualizer.exceptions.UnmappedURIException;
+import de.rwthaachen.openlap.visualizer.dtos.error.BaseErrorDTO;
+import de.rwthaachen.openlap.visualizer.dtos.request.RequestDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

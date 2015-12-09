@@ -1,9 +1,8 @@
-package de.rwthaachen.olap.visualizer;
+package de.rwthaachen.openlap.visualizer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 

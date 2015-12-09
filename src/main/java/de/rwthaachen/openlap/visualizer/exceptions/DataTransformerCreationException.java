@@ -1,4 +1,4 @@
-package de.rwthaachen.olap.visualizer.exceptions;
+package de.rwthaachen.openlap.visualizer.exceptions;
 
 /**
  * Created by bas on 12/9/15.

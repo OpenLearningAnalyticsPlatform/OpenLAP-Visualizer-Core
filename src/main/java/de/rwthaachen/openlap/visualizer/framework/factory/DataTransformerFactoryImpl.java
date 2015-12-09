@@ -1,8 +1,8 @@
-package de.rwthaachen.olap.visualizer.framework.factory;
+package de.rwthaachen.openlap.visualizer.framework.factory;
 
-import de.rwthaachen.olap.visualizer.exceptions.BaseException;
-import de.rwthaachen.olap.visualizer.exceptions.DataTransformerCreationException;
-import de.rwthaachen.olap.visualizer.framework.adapters.DataTransformer;
+import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
+import de.rwthaachen.openlap.visualizer.exceptions.DataTransformerCreationException;
+import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
 
 import java.lang.reflect.Modifier;
 

@@ -1,7 +1,7 @@
 package de.rwthaachen.olap.visualizer.controller;
 
-import de.rwthaachen.olap.visualizer.models.request.Request;
-import de.rwthaachen.olap.visualizer.models.response.Response;
+import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
+import de.rwthaachen.olap.visualizer.dtos.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 public class VisualizationEngineController {
 
     @RequestMapping(value = "/generateVisualizationCode", method = RequestMethod.POST)
-    public Response generateVisualizationCode(@RequestBody Request requestBody) {
-        return new Response();
+    public ResponseDTO generateVisualizationCode(@RequestBody RequestDTO requestDTOBody) {
+        return new ResponseDTO();
     }
 
 }

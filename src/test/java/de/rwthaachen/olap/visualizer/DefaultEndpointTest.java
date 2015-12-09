@@ -2,7 +2,7 @@ package de.rwthaachen.olap.visualizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwthaachen.olap.visualizer.controller.DefaultController;
-import de.rwthaachen.olap.visualizer.models.request.Request;
+import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +44,7 @@ public class DefaultEndpointTest {
     @Test
     public void testNonExistingEndpoints() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/something")
-                .content(objectMapper.writeValueAsString(new Request<>()))
+                .content(objectMapper.writeValueAsString(new RequestDTO<>()))
                 .contentType(contentType))
                 .andExpect(MockMvcResultMatchers.status().isNotImplemented())
                 .andDo(MockMvcResultHandlers.print());

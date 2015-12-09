@@ -1,16 +1,33 @@
 package de.rwthaachen.olap.visualizer.exceptions;
 
-import org.springframework.http.HttpStatus;
-
 /**
  * All the exceptions should extend this base error and add their relevant
  * details
  */
-public abstract class BaseException extends RuntimeException{
+public class BaseException extends RuntimeException {
 
-    public abstract String getLocalStatusCode();
+    private String exceptionType;
+    private String localStatusCode;
 
-    protected BaseException(String message){
+    protected BaseException(String message, String typeOfException, String localStatusCode) {
         super(message);
+        this.exceptionType = typeOfException;
+        this.localStatusCode = localStatusCode;
+    }
+
+    public String getExceptionType() {
+        return exceptionType;
+    }
+
+    public void setExceptionType(String exceptionType) {
+        this.exceptionType = exceptionType;
+    }
+
+    public String getLocalStatusCode() {
+        return localStatusCode;
+    }
+
+    public void setLocalStatusCode(String localStatusCode) {
+        this.localStatusCode = localStatusCode;
     }
 }

@@ -1,7 +1,7 @@
 package de.rwthaachen.olap.visualizer.controller;
 
-import de.rwthaachen.olap.visualizer.models.request.Request;
-import de.rwthaachen.olap.visualizer.models.response.Response;
+import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
+import de.rwthaachen.olap.visualizer.dtos.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -12,39 +12,39 @@ import org.springframework.web.bind.annotation.*;
 public class VisualizationFrameworksController {
 
     @RequestMapping(value = "/{idOfFramework}/update", method = RequestMethod.PUT)
-    public Response updateVisualizationFramework(@PathVariable String idOfFramework, @RequestBody Request requestBody) {
-        return new Response();
+    public ResponseDTO updateVisualizationFramework(@PathVariable String idOfFramework, @RequestBody RequestDTO requestDTOBody) {
+        return new ResponseDTO();
     }
 
     @RequestMapping(value = "/{idOfFramework}/delete", method = RequestMethod.DELETE)
-    public Response deleteVisualizationFramework(@PathVariable String idOfFramework){
-        return new Response();
+    public ResponseDTO deleteVisualizationFramework(@PathVariable String idOfFramework){
+        return new ResponseDTO();
 
     }
 
     @RequestMapping(value = "/{idOfFramework}", method = RequestMethod.GET)
-    public Response getFrameworkDetails (@PathVariable String idOfFramework){
-        return new Response();
+    public ResponseDTO getFrameworkDetails (@PathVariable String idOfFramework){
+        return new ResponseDTO();
 
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
-    public Response uploadNewVisualizationFramework(@RequestBody Request requestBody){
-        return new Response();
+    public ResponseDTO uploadNewVisualizationFramework(@RequestBody RequestDTO requestDTOBody){
+        return new ResponseDTO();
 
     }
 
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.GET)
-    public Response getFrameworkMethodDetails (@PathVariable String idOfFramework, @PathVariable String idOfMethod){
-        return new Response();
+    public ResponseDTO getFrameworkMethodDetails (@PathVariable String idOfFramework, @PathVariable String idOfMethod){
+        return new ResponseDTO();
 
     }
 
     /**
      * update only the attributes such as description, data transformer of the method*/
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.PUT)
-    public Response updateVisualizationFrameworkMethod (@PathVariable String idOfFramework, @PathVariable String idOfMethod, @RequestBody Request requestBody){
-        return new Response();
+    public ResponseDTO updateVisualizationFrameworkMethod (@PathVariable String idOfFramework, @PathVariable String idOfMethod, @RequestBody RequestDTO requestDTOBody){
+        return new ResponseDTO();
 
     }
 

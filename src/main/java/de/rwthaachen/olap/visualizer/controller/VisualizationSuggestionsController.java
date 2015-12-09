@@ -1,7 +1,7 @@
 package de.rwthaachen.olap.visualizer.controller;
 
-import de.rwthaachen.olap.visualizer.models.request.Request;
-import de.rwthaachen.olap.visualizer.models.response.Response;
+import de.rwthaachen.olap.visualizer.dtos.request.RequestDTO;
+import de.rwthaachen.olap.visualizer.dtos.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -12,26 +12,26 @@ import org.springframework.web.bind.annotation.*;
 public class VisualizationSuggestionsController {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Response visualizationSuggestionsForAnalyticsMethod(@RequestParam(value = "methodName", defaultValue = "") String analyticsMethod, @RequestParam(value = "methodCategory", defaultValue = "") String analyticsMethodCategory) {
-        return new Response();
+    public ResponseDTO visualizationSuggestionsForAnalyticsMethod(@RequestParam(value = "methodName", defaultValue = "") String analyticsMethod, @RequestParam(value = "methodCategory", defaultValue = "") String analyticsMethodCategory) {
+        return new ResponseDTO();
 
     }
 
     @RequestMapping(value = "/{idOfSuggestion}/update", method = RequestMethod.PUT)
-    public Response updateVisualizationSuggestion(@RequestBody Request requestbody) {
-        return new Response();
+    public ResponseDTO updateVisualizationSuggestion(@RequestBody RequestDTO requestbody) {
+        return new ResponseDTO();
 
     }
 
     @RequestMapping(value = "/{idOfSuggestion}/delete", method = RequestMethod.DELETE)
-    public Response deleteVisualizationSuggestion() {
-        return new Response();
+    public ResponseDTO deleteVisualizationSuggestion() {
+        return new ResponseDTO();
 
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
-    public Response createVisualizationSuggestion(@RequestBody Request requestBody) {
-        return new Response();
+    public ResponseDTO createVisualizationSuggestion(@RequestBody RequestDTO requestDTOBody) {
+        return new ResponseDTO();
 
     }
 }

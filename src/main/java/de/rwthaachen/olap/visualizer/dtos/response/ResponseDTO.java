@@ -1,10 +1,10 @@
-package de.rwthaachen.olap.visualizer.models.response;
+package de.rwthaachen.olap.visualizer.dtos.response;
 
 /**
  * The super class of all the responses sent back by the Modular Visualization Framework.
  * Extend this class and add details of the responses
  */
-public class Response<T> {
+public class ResponseDTO<T> {
 
     private T responseBodyContent;
 

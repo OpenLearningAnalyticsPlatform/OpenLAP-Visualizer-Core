@@ -26,7 +26,7 @@ public class DefaultController {
     public ResponseEntity<Object> handleUnmappedURIException(UnmappedURIException exception, HttpServletRequest request) {
         //log the error
         //create a client response
-        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getLocalStatusCode(),exception.getLocalizedMessage(),"","");
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception,exception.getLocalizedMessage(),"","");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(error,headers,HttpStatus.NOT_IMPLEMENTED);

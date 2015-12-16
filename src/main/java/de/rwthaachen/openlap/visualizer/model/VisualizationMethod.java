@@ -9,7 +9,7 @@ import javax.persistence.*;
  * @author Bassim Bashir
  */
 @Entity
-@Table (name = "VIS_METHODS")
+@Table(name = "VIS_METHODS")
 public class VisualizationMethod {
 
     @Id
@@ -20,9 +20,21 @@ public class VisualizationMethod {
     private String implementingClassName;
     @Column(nullable = false, name = "VIS_METHOD_NAME")
     private String name;
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn (name = "VIS_FRAMEWORK_FID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "VIS_FRAMEWORK_FID")
     private VisualizationFramework visualizationFramework;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DATA_TRANSFORMER_METHOD_FID")
+    private DataTransformerMethod dataTransformerMethod;
+
+    private VisualizationMethod() {
+    }
+
+    public VisualizationMethod(String implementingClassName, String name) {
+        this();
+        this.implementingClassName = implementingClassName;
+        this.name = name;
+    }
 
     public long getId() {
         return id;
@@ -56,6 +68,14 @@ public class VisualizationMethod {
         this.visualizationFramework = visualizationFramework;
     }
 
+    public DataTransformerMethod getDataTransformerMethod() {
+        return dataTransformerMethod;
+    }
+
+    public void setDataTransformerMethod(DataTransformerMethod dataTransformerMethod) {
+        this.dataTransformerMethod = dataTransformerMethod;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,7 +87,9 @@ public class VisualizationMethod {
         if (implementingClassName != null ? !implementingClassName.equals(that.implementingClassName) : that.implementingClassName != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return visualizationFramework != null ? visualizationFramework.equals(that.visualizationFramework) : that.visualizationFramework == null;
+        if (visualizationFramework != null ? !visualizationFramework.equals(that.visualizationFramework) : that.visualizationFramework != null)
+            return false;
+        return dataTransformerMethod != null ? dataTransformerMethod.equals(that.dataTransformerMethod) : that.dataTransformerMethod == null;
 
     }
 
@@ -77,6 +99,7 @@ public class VisualizationMethod {
         result = 31 * result + (implementingClassName != null ? implementingClassName.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (visualizationFramework != null ? visualizationFramework.hashCode() : 0);
+        result = 31 * result + (dataTransformerMethod != null ? dataTransformerMethod.hashCode() : 0);
         return result;
     }
 }

@@ -19,7 +19,7 @@ public class VisualizationFramework {
     String uploadedBy;
     @Column(name = "VIS_FRAMEWORK_DESCRIPTION")
     String description;
-    @Column(name = "VIS_FRAMEWORK_LOCATION")
+    @Column(nullable = false, name = "VIS_FRAMEWORK_LOCATION")
     String frameworkLocation;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,12 +27,17 @@ public class VisualizationFramework {
     private long id;
     @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.LAZY)
     private List<VisualizationMethod> visualizationMethods;
-    @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.LAZY)
-    private List<DataTransformerMethod> dataTransformerMethods;
 
-    public VisualizationFramework(){
+    private VisualizationFramework(){
         visualizationMethods = new ArrayList<>();
-        dataTransformerMethods = new  ArrayList<>();
+    }
+
+    public VisualizationFramework(String name, String uploadedBy, String description, String frameworkLocation){
+        this();
+        this.name = name;
+        this.uploadedBy = uploadedBy;
+        this.description = description;
+        this.frameworkLocation = frameworkLocation;
     }
 
     public long getId() {
@@ -83,14 +88,6 @@ public class VisualizationFramework {
         this.visualizationMethods = visualizationMethods;
     }
 
-    public List<DataTransformerMethod> getDataTransformerMethods() {
-        return dataTransformerMethods;
-    }
-
-    public void setDataTransformerMethods(List<DataTransformerMethod> dataTransformerMethods) {
-        this.dataTransformerMethods = dataTransformerMethods;
-    }
-
     @Override
     public String toString() {
         return "Vis Framework details :[id:" + id + ",name:" + name + ",uploadedBy:" + uploadedBy + ",description:" + description + ",location:" + frameworkLocation + "]";
@@ -109,21 +106,18 @@ public class VisualizationFramework {
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (frameworkLocation != null ? !frameworkLocation.equals(that.frameworkLocation) : that.frameworkLocation != null)
             return false;
-        if (visualizationMethods != null ? !visualizationMethods.equals(that.visualizationMethods) : that.visualizationMethods != null)
-            return false;
-        return dataTransformerMethods != null ? dataTransformerMethods.equals(that.dataTransformerMethods) : that.dataTransformerMethods == null;
+        return visualizationMethods != null ? visualizationMethods.equals(that.visualizationMethods) : that.visualizationMethods == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (uploadedBy != null ? uploadedBy.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (frameworkLocation != null ? frameworkLocation.hashCode() : 0);
+        result = 31 * result + (int) (id ^ (id >>> 32));
         result = 31 * result + (visualizationMethods != null ? visualizationMethods.hashCode() : 0);
-        result = 31 * result + (dataTransformerMethods != null ? dataTransformerMethods.hashCode() : 0);
         return result;
     }
 }

@@ -8,7 +8,7 @@ import javax.persistence.*;
  * @author Bassim Bashir
  */
 @Entity
-@Table (name = "DATA_TRANSFORMER_METHODS")
+@Table(name = "DATA_TRANSFORMER_METHODS")
 public class DataTransformerMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,9 +18,17 @@ public class DataTransformerMethod {
     private String implementingClassName;
     @Column(nullable = false, name = "TRANSFORMER_METHOD_NAME")
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "VIS_FRAMEWORK_FID")
-    private VisualizationFramework visualizationFramework;
+    @OneToOne(mappedBy = "dataTransformerMethod")
+    private VisualizationMethod visualizationMethod;
+
+    private DataTransformerMethod() {
+    }
+
+    public DataTransformerMethod(String name, String implementingClass){
+        this();
+        this.name = name;
+        this.implementingClassName = implementingClass;
+    }
 
     public long getId() {
 
@@ -47,14 +55,6 @@ public class DataTransformerMethod {
         this.name = name;
     }
 
-    public VisualizationFramework getVisualizationFramework() {
-        return visualizationFramework;
-    }
-
-    public void setVisualizationFramework(VisualizationFramework visualizationFramework) {
-        this.visualizationFramework = visualizationFramework;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -66,7 +66,7 @@ public class DataTransformerMethod {
         if (implementingClassName != null ? !implementingClassName.equals(that.implementingClassName) : that.implementingClassName != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return visualizationFramework != null ? visualizationFramework.equals(that.visualizationFramework) : that.visualizationFramework == null;
+        return visualizationMethod != null ? visualizationMethod.equals(that.visualizationMethod) : that.visualizationMethod == null;
 
     }
 
@@ -75,8 +75,7 @@ public class DataTransformerMethod {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (implementingClassName != null ? implementingClassName.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (visualizationFramework != null ? visualizationFramework.hashCode() : 0);
+        result = 31 * result + (visualizationMethod != null ? visualizationMethod.hashCode() : 0);
         return result;
     }
-
 }

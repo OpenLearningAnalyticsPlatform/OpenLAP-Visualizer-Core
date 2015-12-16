@@ -15,7 +15,7 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
 
-        Properties prop = new Properties();
+      /*  Properties prop = new Properties();
         String propFileName = "config.properties";
 
         InputStream inputStream = Application.class.getClassLoader().getResourceAsStream(propFileName);
@@ -30,7 +30,7 @@ public class Application {
         } else {
             System.out.println("property file '" + propFileName + "' not found in the classpath");
         }
-
+*/
     }
 
 }

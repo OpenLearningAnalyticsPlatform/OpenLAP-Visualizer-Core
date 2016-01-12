@@ -6,6 +6,10 @@ import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
 import de.rwthaachen.openlap.visualizer.exceptions.VisualizationMethodNotFoundException;
 import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
 import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
+import de.rwthaachen.openlap.visualizer.framework.factory.DataTransformerFactory;
+import de.rwthaachen.openlap.visualizer.framework.factory.DataTransformerFactoryImpl;
+import de.rwthaachen.openlap.visualizer.framework.factory.VisualizationCodeGeneratorFactory;
+import de.rwthaachen.openlap.visualizer.framework.factory.VisualizationCodeGeneratorFactoryImpl;
 import de.rwthaachen.openlap.visualizer.model.VisualizationFramework;
 import de.rwthaachen.openlap.visualizer.model.VisualizationMethod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,9 @@ public class VisualizationEngineService {
     @Autowired
     VisualizationFrameworkRepository visualizationFrameworkRepository;
 
+    @Autowired
+    ConfigurationService configurationService;
+
     public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet) throws BaseException{
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findByName(frameworkName);
 
@@ -33,9 +40,11 @@ public class VisualizationEngineService {
         if(visualizationMethod.isPresent()){
             //visualization method found
             VisualizationMethod visMethod = visualizationMethod.get();
-            ClassLoader visualizerClassLoader = new DynamicClassLoader(visualizationFramework.getFrameworkLocation());
-            VisualizationCodeGenerator codeGenerator = visualizerClassLoader.loadCodeGenerator(visMethod.getImplementingClassName());
-            DataTransformer dataTransformer = visualizerClassLoader.loadDataTransformer(visMethod.getDataTransformerMethod().getImplementingClassName());
+            //ask the factories for the instances
+            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
+            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClassName());
+            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClassName());
             return codeGenerator.generateVisualizationCode(dataSet,dataTransformer);
         }
         else{

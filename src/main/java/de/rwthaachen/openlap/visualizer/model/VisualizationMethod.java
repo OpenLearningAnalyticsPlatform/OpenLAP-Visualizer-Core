@@ -1,5 +1,8 @@
 package de.rwthaachen.openlap.visualizer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 /**
@@ -10,21 +13,24 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "VIS_METHODS")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VisualizationMethod {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "VIS_METHOD_ID")
     private long id;
     @Column(nullable = false, name = "VIS_METHOD_IMPLEMENTING_CLASS")
+    @JsonIgnore
     private String implementingClassName;
     @Column(nullable = false, name = "VIS_METHOD_NAME")
     private String name;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "VIS_FRAMEWORK_FID")
+    @JsonIgnore
     private VisualizationFramework visualizationFramework;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "DATA_TRANSFORMER_METHOD_FID")
+    @JsonIgnore
     private DataTransformerMethod dataTransformerMethod;
 
     private VisualizationMethod() {

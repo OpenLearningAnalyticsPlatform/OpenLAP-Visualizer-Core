@@ -2,6 +2,7 @@ package de.rwthaachen.openlap.visualizer.framework;
 
 import DataSet.OLAPDataSet;
 import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
+import de.rwthaachen.openlap.visualizer.exceptions.NotTransformableData;
 import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
 import de.rwthaachen.openlap.visualizer.model.TransformedData;
 
@@ -10,12 +11,17 @@ import de.rwthaachen.openlap.visualizer.model.TransformedData;
  */
 public abstract class VisualizationCodeGenerator {
 
-    private DataTransformer dataTransformer; //the data transformer (adapter) to transform OLAPDataset to Visualizer parseable data
-
     public abstract String visualizationCode(TransformedData<?> transformedData);
 
-    public String generateVisualizationCode(OLAPDataSet olapDataSet, String typeOfDataTransformer) throws BaseException {
-        return "";
+    public String generateVisualizationCode(OLAPDataSet olapDataSet, DataTransformer dataTransformer) throws BaseException {
+        TransformedData transformedData = dataTransformer.transformData(olapDataSet);
+        if(transformedData == null)
+            //TODO
+            throw new NotTransformableData("Data could not be transformed"); //add a json dump of olapdataset
+        // via adding a toString
+        else
+            return visualizationCode(transformedData);
     }
+
 
 }

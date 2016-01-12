@@ -1,9 +1,7 @@
 package de.rwthaachen.openlap.visualizer.framework.factory;
 
-import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
 import de.rwthaachen.openlap.visualizer.exceptions.ClassLoaderException;
-import de.rwthaachen.openlap.visualizer.exceptions.DataTransformerCreationException;
-import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
+import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
 import org.xeustechnologies.jcl.JarClassLoader;
 import org.xeustechnologies.jcl.JclObjectFactory;
 import org.xeustechnologies.jcl.exception.JclException;
@@ -11,26 +9,22 @@ import org.xeustechnologies.jcl.proxy.CglibProxyProvider;
 import org.xeustechnologies.jcl.proxy.ProxyProviderFactory;
 
 import java.io.InputStream;
-import java.lang.reflect.Modifier;
 
 /**
- * A concrete implementation of the DataTransformerFactory interface, providing a method for the creation of the
- * DataTransformer adapters
- *
- * @author Bassim Bashir
+ * Created by bas on 1/12/16.
  */
-public class DataTransformerFactoryImpl implements DataTransformerFactory {
+public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeGeneratorFactory {
 
     private JclObjectFactory jclObjectFactory;
     private JarClassLoader jarClassLoader;
 
-    public DataTransformerFactoryImpl(String locationOfJar){
+    public VisualizationCodeGeneratorFactoryImpl(String locationOfJar){
         jarClassLoader = new JarClassLoader();
         jarClassLoader.add(locationOfJar);
         initializeClassLoader();
     }
 
-    public DataTransformerFactoryImpl(InputStream jarStream){
+    public VisualizationCodeGeneratorFactoryImpl(InputStream jarStream){
         jarClassLoader = new JarClassLoader();
         jarClassLoader.add(jarStream);
         initializeClassLoader();
@@ -51,9 +45,10 @@ public class DataTransformerFactoryImpl implements DataTransformerFactory {
     }
 
     @Override
-    public DataTransformer createDataTransformer(String typeOfDataTransformer) throws BaseException {
+    public VisualizationCodeGenerator createVisualizationCodeGenerator(String nameOfCodeGenerator) {
+        //Create and cast object of loaded class
         try {
-            return (DataTransformer) jclObjectFactory.create(jarClassLoader, typeOfDataTransformer);
+            return (VisualizationCodeGenerator) jclObjectFactory.create(jarClassLoader, nameOfCodeGenerator);
         } catch (JclException jclException) {
             throw new ClassLoaderException(jclException.getLocalizedMessage());
         }

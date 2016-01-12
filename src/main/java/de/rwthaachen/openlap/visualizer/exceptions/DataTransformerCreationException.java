@@ -5,8 +5,8 @@ package de.rwthaachen.openlap.visualizer.exceptions;
  */
 public class DataTransformerCreationException extends BaseException {
 
-    public DataTransformerCreationException(String message){
-        super(message, DataTransformerCreationException.class.getSimpleName(),"");
+    public DataTransformerCreationException(String message) {
+        super(message, DataTransformerCreationException.class.getSimpleName(), "");
     }
 
 }

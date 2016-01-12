@@ -1,5 +1,8 @@
 package de.rwthaachen.openlap.visualizer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +13,9 @@ import java.util.List;
  * @author Bassim Bashir
  */
 @Entity
-@Table (name = "VIS_FRAMEWORKS")
+@Table(name = "VIS_FRAMEWORKS")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VisualizationFramework {
-
     @Column(unique = true, nullable = false, name = "VIS_FRAMEWORK_NAME")
     String name;
     @Column(nullable = false, name = "VIS_FRAMEWORK_UPLOADER")
@@ -20,19 +23,20 @@ public class VisualizationFramework {
     @Column(name = "VIS_FRAMEWORK_DESCRIPTION")
     String description;
     @Column(nullable = false, name = "VIS_FRAMEWORK_LOCATION")
+    @JsonIgnore
     String frameworkLocation;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "VIS_FRAMEWORK_ID")
     private long id;
-    @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<VisualizationMethod> visualizationMethods;
 
-    private VisualizationFramework(){
+    private VisualizationFramework() {
         visualizationMethods = new ArrayList<>();
     }
 
-    public VisualizationFramework(String name, String uploadedBy, String description, String frameworkLocation){
+    public VisualizationFramework(String name, String uploadedBy, String description, String frameworkLocation) {
         this();
         this.name = name;
         this.uploadedBy = uploadedBy;

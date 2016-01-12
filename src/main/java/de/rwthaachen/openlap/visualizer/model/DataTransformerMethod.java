@@ -1,5 +1,7 @@
 package de.rwthaachen.openlap.visualizer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 /**
@@ -9,6 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "DATA_TRANSFORMER_METHODS")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DataTransformerMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,7 +27,7 @@ public class DataTransformerMethod {
     private DataTransformerMethod() {
     }
 
-    public DataTransformerMethod(String name, String implementingClass){
+    public DataTransformerMethod(String name, String implementingClass) {
         this();
         this.name = name;
         this.implementingClassName = implementingClass;

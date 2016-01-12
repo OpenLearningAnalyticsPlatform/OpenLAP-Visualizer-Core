@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface VisualizationFrameworkRepository extends CrudRepository<VisualizationFramework,Long> {
 
-    List<VisualizationFramework> findByName (String VIS_FRAMEWORK_NAME);
+    VisualizationFramework findByName (String VIS_FRAMEWORK_NAME);
 
 }
 

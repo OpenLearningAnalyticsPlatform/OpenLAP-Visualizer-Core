@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * A base class which represents the model(contents) of the error that will be sent back to the client.
- * For further modifications inherit this class.
+ * For further modifications inherit from this class.
  */
 public class BaseErrorDTO {
 

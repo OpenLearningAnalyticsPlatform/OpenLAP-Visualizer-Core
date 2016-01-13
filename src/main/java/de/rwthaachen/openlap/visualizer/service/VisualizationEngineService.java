@@ -52,7 +52,25 @@ public class VisualizationEngineService {
         }
     }
 
-    public String generateClientVisualizationCode(long frameworkId, long methodId){
+    public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet){
+        VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(frameworkId);
 
+        Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
+                .stream()
+                .filter((method)-> method.getId() == methodId)
+                .findFirst();
+
+        if(visualizationMethod.isPresent()){
+            VisualizationMethod visMethod = visualizationMethod.get();
+            //ask the factories for the instances
+            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
+            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClassName());
+            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClassName());
+            return codeGenerator.generateVisualizationCode(olapDataSet,dataTransformer);
+        }
+        else{
+            throw new VisualizationMethodNotFoundException("The method: "+methodId+" for the framework: "+frameworkId+" was not found");
+        }
     }
 }

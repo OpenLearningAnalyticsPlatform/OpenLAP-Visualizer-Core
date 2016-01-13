@@ -2,7 +2,6 @@ package de.rwthaachen.openlap.visualizer.controller;
 
 import de.rwthaachen.openlap.visualizer.exceptions.UnmappedURIException;
 import de.rwthaachen.openlap.visualizer.dtos.error.BaseErrorDTO;
-import de.rwthaachen.openlap.visualizer.dtos.request.RequestDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class DefaultController {
     @RequestMapping("/**")
-    public void unmappedRequest(@RequestBody RequestDTO<?> requestDTOBody, HttpServletRequest request) {
+    public void unmappedRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
         throw new UnmappedURIException("The endpoint " + uri + " is not supported");
     }

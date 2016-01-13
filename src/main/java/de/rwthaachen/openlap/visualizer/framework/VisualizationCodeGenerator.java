@@ -2,7 +2,7 @@ package de.rwthaachen.openlap.visualizer.framework;
 
 import DataSet.OLAPDataSet;
 import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
-import de.rwthaachen.openlap.visualizer.exceptions.NotTransformableData;
+import de.rwthaachen.openlap.visualizer.exceptions.UnTransformableData;
 import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
 import de.rwthaachen.openlap.visualizer.model.TransformedData;
 
@@ -17,7 +17,7 @@ public abstract class VisualizationCodeGenerator {
         TransformedData transformedData = dataTransformer.transformData(olapDataSet);
         if(transformedData == null)
             //TODO
-            throw new NotTransformableData("Data could not be transformed"); //add a json dump of olapdataset
+            throw new UnTransformableData("Data could not be transformed"); //add a json dump of olapdataset
         // via adding a toString
         else
             return visualizationCode(transformedData);

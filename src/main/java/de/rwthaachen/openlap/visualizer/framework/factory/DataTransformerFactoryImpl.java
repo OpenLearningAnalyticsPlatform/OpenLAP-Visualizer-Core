@@ -1,7 +1,5 @@
 package de.rwthaachen.openlap.visualizer.framework.factory;
 
-import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
-import de.rwthaachen.openlap.visualizer.exceptions.ClassLoaderException;
 import de.rwthaachen.openlap.visualizer.exceptions.DataTransformerCreationException;
 import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
 import org.xeustechnologies.jcl.JarClassLoader;
@@ -11,7 +9,6 @@ import org.xeustechnologies.jcl.proxy.CglibProxyProvider;
 import org.xeustechnologies.jcl.proxy.ProxyProviderFactory;
 
 import java.io.InputStream;
-import java.lang.reflect.Modifier;
 
 /**
  * A concrete implementation of the DataTransformerFactory interface, providing a method for the creation of the
@@ -51,11 +48,11 @@ public class DataTransformerFactoryImpl implements DataTransformerFactory {
     }
 
     @Override
-    public DataTransformer createDataTransformer(String typeOfDataTransformer) throws BaseException {
+    public DataTransformer createDataTransformer(String typeOfDataTransformer) throws DataTransformerCreationException {
         try {
             return (DataTransformer) jclObjectFactory.create(jarClassLoader, typeOfDataTransformer);
         } catch (JclException jclException) {
-            throw new ClassLoaderException(jclException.getLocalizedMessage());
+            throw new DataTransformerCreationException(jclException.getLocalizedMessage());
         }
     }
 }

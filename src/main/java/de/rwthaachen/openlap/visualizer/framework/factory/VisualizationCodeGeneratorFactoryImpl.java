@@ -1,6 +1,6 @@
 package de.rwthaachen.openlap.visualizer.framework.factory;
 
-import de.rwthaachen.openlap.visualizer.exceptions.ClassLoaderException;
+import de.rwthaachen.openlap.visualizer.exceptions.VisualizationCodeGeneratorCreationException;
 import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
 import org.xeustechnologies.jcl.JarClassLoader;
 import org.xeustechnologies.jcl.JclObjectFactory;
@@ -45,12 +45,12 @@ public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeG
     }
 
     @Override
-    public VisualizationCodeGenerator createVisualizationCodeGenerator(String nameOfCodeGenerator) {
+    public VisualizationCodeGenerator createVisualizationCodeGenerator(String nameOfCodeGenerator) throws VisualizationCodeGeneratorCreationException {
         //Create and cast object of loaded class
         try {
             return (VisualizationCodeGenerator) jclObjectFactory.create(jarClassLoader, nameOfCodeGenerator);
         } catch (JclException jclException) {
-            throw new ClassLoaderException(jclException.getLocalizedMessage());
+            throw new VisualizationCodeGeneratorCreationException(jclException.getLocalizedMessage());
         }
     }
 }

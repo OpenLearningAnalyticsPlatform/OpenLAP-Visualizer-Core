@@ -1,6 +1,6 @@
 package de.rwthaachen.openlap.visualizer.framework.factory;
 
-import de.rwthaachen.openlap.visualizer.exceptions.BaseException;
+import de.rwthaachen.openlap.visualizer.exceptions.DataTransformerCreationException;
 import de.rwthaachen.openlap.visualizer.framework.adapters.DataTransformer;
 
 /**
@@ -15,7 +15,7 @@ public interface DataTransformerFactory {
      *
      * @param typeOfDataTransformer The name of the DataTransformer to instantiate
      * @return The object of the DataTransformer, null in the case that the DataTransformer could not be instantiated
-     * @throws BaseException Throws a wrapped BaseException specifying the cause of failure while trying to create the DataTransfomer object
+     * @throws DataTransformerCreationException Throws a wrapped DataTransformerCreationException specifying the cause of failure while trying to create the DataTransfomer object
      */
-    DataTransformer createDataTransformer(String typeOfDataTransformer) throws BaseException;
+    DataTransformer createDataTransformer(String typeOfDataTransformer) throws DataTransformerCreationException;
 }

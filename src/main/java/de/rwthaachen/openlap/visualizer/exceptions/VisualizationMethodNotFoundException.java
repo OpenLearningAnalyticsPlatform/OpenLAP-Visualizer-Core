@@ -6,6 +6,6 @@ package de.rwthaachen.openlap.visualizer.exceptions;
 public class VisualizationMethodNotFoundException extends BaseException {
 
     public VisualizationMethodNotFoundException(String message) {
-        super(message, VisualizationMethodNotFoundException.class.getSimpleName(), "");
+        super(message,VisualizationMethodNotFoundException.class.getSimpleName(),"");
     }
 }

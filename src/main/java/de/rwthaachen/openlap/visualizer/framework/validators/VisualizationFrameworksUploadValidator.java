@@ -1,7 +1,12 @@
 package de.rwthaachen.openlap.visualizer.framework.validators;
 
-import de.rwthaachen.openlap.visualizer.exceptions.ClassLoaderException;
-import de.rwthaachen.openlap.visualizer.exceptions.VisualizationFrameworksUploadValidatorException;
+import de.rwthaachen.openlap.visualizer.exceptions.DataTransformerCreationException;
+import de.rwthaachen.openlap.visualizer.exceptions.VisualizationCodeGeneratorCreationException;
+import de.rwthaachen.openlap.visualizer.exceptions.VisualizationFrameworksUploadException;
+import de.rwthaachen.openlap.visualizer.framework.factory.DataTransformerFactory;
+import de.rwthaachen.openlap.visualizer.framework.factory.DataTransformerFactoryImpl;
+import de.rwthaachen.openlap.visualizer.framework.factory.VisualizationCodeGeneratorFactory;
+import de.rwthaachen.openlap.visualizer.framework.factory.VisualizationCodeGeneratorFactoryImpl;
 import de.rwthaachen.openlap.visualizer.model.VisualizationFramework;
 import de.rwthaachen.openlap.visualizer.model.VisualizationMethod;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,10 +18,11 @@ import java.util.function.Predicate;
 /**
  * Class contains the logic and functions to validate the config object of visualization frameworks
  */
+//TODO: convert the framework config to json and encapsulate it in the exception to send back to the client upon failure of validation
 public class VisualizationFrameworksUploadValidator {
 
     //TODO: return information about why the validation failed!!!
-    public boolean validateVisualizationFrameworksUploadConfiguration(List<VisualizationFramework> frameworksConfig, MultipartFile frameworksJar) throws BaseException {
+    public boolean validateVisualizationFrameworksUploadConfiguration(List<VisualizationFramework> frameworksConfig, MultipartFile frameworksJar) throws VisualizationFrameworksUploadException {
         // first step of validation, check if all the fields are not null
         if (frameworksConfig.stream().filter(new Predicate<VisualizationFramework>() {
             @Override
@@ -51,23 +57,24 @@ public class VisualizationFrameworksUploadValidator {
         }
         //now try loading the classes and confirm if they implement the required interfaces
         try {
-            ClassLoader visualizerClassLoader = new DynamicClassLoader(frameworksJar.getInputStream());
+            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(frameworksJar.getInputStream());
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(frameworksJar.getInputStream());
             for(VisualizationFramework visualizationFramework : frameworksConfig){
                 for(VisualizationMethod visualizationMethod : visualizationFramework.getVisualizationMethods()){
                     //lets first check the code generator
                     try {
-                        if(visualizerClassLoader.loadCodeGenerator(visualizationMethod.getImplementingClassName())==null)
+                        if(visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClassName())==null)
                             return false;
                         //now the data transformer
-                        if(visualizerClassLoader.loadDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClassName())==null)
+                        if(dataTransformerFactory.createDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClassName())==null)
                             return false;
-                    }catch (ClassLoaderException exception){
-                        return false;
+                    }catch (DataTransformerCreationException | VisualizationCodeGeneratorCreationException exception){
+                        throw new VisualizationFrameworksUploadException(exception.getMessage());
                     }
                 }
             }
         }catch (IOException exception){
-            throw new VisualizationFrameworksUploadValidatorException(exception.getLocalizedMessage());
+            throw new VisualizationFrameworksUploadException(exception.getMessage());
         }
         return true;
     }

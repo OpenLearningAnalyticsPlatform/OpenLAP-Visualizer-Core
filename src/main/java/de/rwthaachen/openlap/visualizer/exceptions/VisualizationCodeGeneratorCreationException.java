@@ -5,6 +5,6 @@ package de.rwthaachen.openlap.visualizer.exceptions;
  */
 public class VisualizationCodeGeneratorCreationException extends BaseException {
     public VisualizationCodeGeneratorCreationException(String message){
-        super(message, VisualizationCodeGeneratorCreationException.class.getSimpleName(),"");
+        super(message,VisualizationCodeGeneratorCreationException.class.getSimpleName(),"");
     }
 }

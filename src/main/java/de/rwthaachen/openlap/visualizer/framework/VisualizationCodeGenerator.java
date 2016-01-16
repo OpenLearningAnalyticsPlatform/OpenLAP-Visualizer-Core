@@ -20,6 +20,7 @@ public abstract class VisualizationCodeGenerator {
             throw new UnTransformableData("Data could not be transformed"); //add a json dump of olapdataset
         // via adding a toString
         else
+        //TODO: Escape the HTML code
             return visualizationCode(transformedData);
     }
 

@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * Created by bas on 1/12/16.
+ * Service which contains the configuration parameters of the System. All the properties added to the properties file should be made accessible throughout the system
+ * via this service
+ *
+ * @author Bassim Bashir
+ *
  */
 @Service
 public class ConfigurationService {
@@ -17,6 +21,12 @@ public class ConfigurationService {
 
     @Value("${fileManagerTempStorageLocation}")
     private String fileManagerTempStorageLocation;
+
+    @Value("${jarBundleExtension}")
+    private String jarBundleExtension;
+
+    @Value("${apiVersionNumber}")
+    private String apiVersionNumber;
 
     public String getVisualizationFrameworksJarStorageLocation() {
         return visualizationFrameworksJarStorageLocation;
@@ -40,5 +50,21 @@ public class ConfigurationService {
 
     public void setFileManagerTempStorageLocation(String fileManagerTempStorageLocation) {
         this.fileManagerTempStorageLocation = fileManagerTempStorageLocation;
+    }
+
+    public String getJarBundleExtension() {
+        return jarBundleExtension;
+    }
+
+    public void setJarBundleExtension(String jarBundleExtension) {
+        this.jarBundleExtension = jarBundleExtension;
+    }
+
+    public String getApiVersionNumber() {
+        return apiVersionNumber;
+    }
+
+    public void setApiVersionNumber(String apiVersionNumber) {
+        this.apiVersionNumber = apiVersionNumber;
     }
 }

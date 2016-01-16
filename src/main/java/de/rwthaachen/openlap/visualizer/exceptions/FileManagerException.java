@@ -6,6 +6,6 @@ package de.rwthaachen.openlap.visualizer.exceptions;
 public class FileManagerException extends BaseException {
 
     public FileManagerException(String message) {
-        super(message, FileManagerException.class.getSimpleName(), "");
+        super(message,FileManagerException.class.getSimpleName(),"");
     }
 }

@@ -2,6 +2,7 @@ package de.rwthaachen.openlap.visualizer.controller;
 
 import de.rwthaachen.openlap.visualizer.exceptions.UnmappedURIException;
 import de.rwthaachen.openlap.visualizer.dtos.error.BaseErrorDTO;
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,9 +24,8 @@ public class DefaultController {
 
     @ExceptionHandler(UnmappedURIException.class)
     public ResponseEntity<Object> handleUnmappedURIException(UnmappedURIException exception, HttpServletRequest request) {
-        //log the error
         //create a client response
-        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception,exception.getLocalizedMessage(),"","");
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(),"","");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(error,headers,HttpStatus.NOT_IMPLEMENTED);

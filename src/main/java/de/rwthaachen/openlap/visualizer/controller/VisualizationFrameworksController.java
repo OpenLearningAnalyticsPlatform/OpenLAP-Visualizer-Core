@@ -1,6 +1,8 @@
 package de.rwthaachen.openlap.visualizer.controller;
 
 import de.rwthaachen.openlap.visualizer.dtos.error.BaseErrorDTO;
+import de.rwthaachen.openlap.visualizer.dtos.request.UpdateVisualizationFrameworkRequest;
+import de.rwthaachen.openlap.visualizer.dtos.request.UpdateVisualizationMethodRequest;
 import de.rwthaachen.openlap.visualizer.dtos.response.*;
 import de.rwthaachen.openlap.visualizer.exceptions.VisualizationFrameworkDeletionException;
 import de.rwthaachen.openlap.visualizer.exceptions.VisualizationFrameworksUploadException;
@@ -17,11 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Created by bas on 11/17/15.
- */
 @RestController
 @RequestMapping("/frameworks")
 public class VisualizationFrameworksController {
@@ -30,12 +28,15 @@ public class VisualizationFrameworksController {
     VisualizationFrameworksService visualizationFrameworksService;
 
     @RequestMapping(value = "/{idOfFramework}/update", method = RequestMethod.PUT)
-    public ResponseDTO updateVisualizationFramework(@PathVariable String idOfFramework, @RequestBody RequestDTO requestDTOBody) {
-        return new ResponseDTO();
+    public UpdateVisualizationFrameworkResponse updateVisualizationFramework(@PathVariable long idOfFramework, @RequestBody UpdateVisualizationFrameworkRequest updateVisualizationFrameworkRequest) {
+        UpdateVisualizationFrameworkResponse response = new UpdateVisualizationFrameworkResponse();
+        visualizationFrameworksService.updateVisualizationFrameworkAttributes(updateVisualizationFrameworkRequest.getVisualizationFramework(), idOfFramework);
+        response.setSuccess(true);
+        return response;
     }
 
     @RequestMapping(value = "/{idOfFramework}/delete", method = RequestMethod.DELETE)
-    public DeleteVisualizationFrameworkResponse deleteVisualizationFramework(@PathVariable String idOfFramework){
+    public DeleteVisualizationFrameworkResponse deleteVisualizationFramework(@PathVariable String idOfFramework) {
         visualizationFrameworksService.deleteVisualizationFramework(idOfFramework);
         DeleteVisualizationFrameworkResponse response = new DeleteVisualizationFrameworkResponse();
         response.setSuccess(true);
@@ -43,7 +44,7 @@ public class VisualizationFrameworksController {
     }
 
     @RequestMapping(value = "/{idOfFramework}", method = RequestMethod.GET)
-    public VisualizationFrameworkDetailsResponse getFrameworkDetails (@PathVariable long idOfFramework){
+    public VisualizationFrameworkDetailsResponse getFrameworkDetails(@PathVariable long idOfFramework) {
         VisualizationFrameworkDetailsResponse response = new VisualizationFrameworkDetailsResponse();
         response.setVisualizationFramework(visualizationFrameworksService.findVisualizationFrameworkById(idOfFramework));
         return response;
@@ -51,9 +52,9 @@ public class VisualizationFrameworksController {
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
-    public UploadVisualizationFrameworkResponse uploadNewVisualizationFramework(@RequestParam ("frameworkJarBundle") MultipartFile frameworkJarBundle,
-                                                                                @RequestParam ("frameworkConfiguration") List<VisualizationFramework> frameworkConfigurations){
-        visualizationFrameworksService.uploadVisualizationFrameworks(frameworkConfigurations,frameworkJarBundle);
+    public UploadVisualizationFrameworkResponse uploadNewVisualizationFramework(@RequestParam("frameworkJarBundle") MultipartFile frameworkJarBundle,
+                                                                                @RequestParam("frameworkConfiguration") List<VisualizationFramework> frameworkConfigurations) {
+        visualizationFrameworksService.uploadVisualizationFrameworks(frameworkConfigurations, frameworkJarBundle);
         UploadVisualizationFrameworkResponse response = new UploadVisualizationFrameworkResponse();
         response.setSuccess(true);
         return response;
@@ -61,55 +62,47 @@ public class VisualizationFrameworksController {
     }
 
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.GET)
-    public VisualizationMethodDetailsResponse getFrameworkMethodDetails (@PathVariable long idOfFramework, @PathVariable long idOfMethod){
+    public VisualizationMethodDetailsResponse getFrameworkMethodDetails(@PathVariable long idOfFramework, @PathVariable long idOfMethod) {
         VisualizationMethodDetailsResponse response = new VisualizationMethodDetailsResponse();
-        VisualizationFramework visualizationFramework = visualizationFrameworksService.findVisualizationFrameworkById(idOfFramework);
-        if(visualizationFramework != null) {
-            Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
-                    .stream()
-                    .filter((method) -> method.getId() == idOfMethod)
-                    .findFirst();
-            if(visualizationMethod.isPresent())
-                response.setVisualizationMethod(visualizationMethod.get());
-            else
-                response.setVisualizationMethod(new VisualizationMethod("",""));
-        }else{
-            response.setVisualizationMethod(new VisualizationMethod("",""));
-        }
+        VisualizationMethod visualizationMethod = visualizationFrameworksService.findVisualizationMethodById(idOfMethod);
+        if (visualizationMethod != null)
+            response.setVisualizationMethod(visualizationMethod);
+        else
+            response.setVisualizationMethod(new VisualizationMethod("", ""));
         return response;
     }
 
     /**
-     * update only the attributes such as description, data transformer of the method*/
+     * update only the attributes such as description, data transformer of the method
+     */
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.PUT)
-    public UpdateVisualizationMethodResponse updateVisualizationFrameworkMethod (@PathVariable long idOfFramework, @PathVariable long idOfMethod, @RequestBody VisualizationMethod visualizationMethod){
+    public UpdateVisualizationMethodResponse updateVisualizationFrameworkMethod(@PathVariable long idOfFramework, @PathVariable long idOfMethod, @RequestBody UpdateVisualizationMethodRequest updateVisualizationMethodRequest) {
         UpdateVisualizationMethodResponse response = new UpdateVisualizationMethodResponse();
-        VisualizationFramework visualizationFramework = visualizationFrameworksService.findVisualizationFrameworkById(idOfFramework);
-        if(visualizationFramework != null) {
-            Optional<VisualizationMethod> visMethod = visualizationFramework.getVisualizationMethods()
-                    .stream()
-                    .filter((method) -> method.getId() == idOfMethod)
-                    .findFirst();
-            if (visMethod.isPresent()) {
-
-            }
-        }
+        visualizationFrameworksService.updateVisualizationMethodAttributes(updateVisualizationMethodRequest.getVisualizationMethod(), idOfMethod);
+        response.setSuccess(true);
         return response;
+    }
+
+    @RequestMapping(value = "/frameworks", method = RequestMethod.GET)
+    public VisualizationFrameworksDetailsResponse getVisualizationFrameworks() {
+        VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = new VisualizationFrameworksDetailsResponse();
+        visualizationFrameworksDetailsResponse.setVisualizationFrameworks(visualizationFrameworksService.findAllVisualizationFrameworks());
+        return visualizationFrameworksDetailsResponse;
     }
 
     @ExceptionHandler(VisualizationFrameworksUploadException.class)
     public ResponseEntity<Object> handleVisFrameworkUploadException(VisualizationFrameworksUploadException exception, HttpServletRequest request) {
-        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(),"","");
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(error,headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(VisualizationFrameworkDeletionException.class)
     public ResponseEntity<Object> handleVisFrameworkUploadException(VisualizationFrameworkDeletionException exception, HttpServletRequest request) {
-        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(),"","");
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(error,headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

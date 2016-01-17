@@ -14,6 +14,7 @@ public abstract class VisualizationCodeGenerator {
     public abstract String visualizationCode(TransformedData<?> transformedData);
 
     public String generateVisualizationCode(OLAPDataSet olapDataSet, DataTransformer dataTransformer) throws BaseException {
+        dataTransformer.
         TransformedData transformedData = dataTransformer.transformData(olapDataSet);
         if(transformedData == null)
             //TODO

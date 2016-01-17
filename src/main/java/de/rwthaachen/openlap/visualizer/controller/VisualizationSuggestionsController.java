@@ -2,9 +2,6 @@ package de.rwthaachen.openlap.visualizer.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Created by bas on 11/17/15.
- */
 @RestController
 @RequestMapping("/suggestions")
 public class VisualizationSuggestionsController {

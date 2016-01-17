@@ -155,4 +155,22 @@ public class VisualizationFrameworksService {
         //commit the changes
         visualizationMethodRepository.save(visualizationMethod);
     }
+
+    /**
+     * Updates the attributes of visualization framework
+     *
+     * @param newAttributes An instance filled with the new values of the visualization framework. Only the attributes namely, description and uploadedBy can be
+     *                      updated
+     * @param idOfFramework the id of the visualization framework to be updated
+     */
+    public void updateVisualizationFrameworkAttributes(VisualizationFramework newAttributes, long idOfFramework) {
+        VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(idOfFramework);
+
+        if(newAttributes.getDescription()!=null && !newAttributes.getDescription().isEmpty())
+            visualizationFramework.setDescription(newAttributes.getDescription());
+        if(newAttributes.getUploadedBy()!=null && !newAttributes.getUploadedBy().isEmpty())
+            visualizationFramework.setUploadedBy(newAttributes.getUploadedBy());
+
+        visualizationFrameworkRepository.save(visualizationFramework);
+    }
 }

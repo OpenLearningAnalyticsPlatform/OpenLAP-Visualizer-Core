@@ -11,14 +11,6 @@ import de.rwthaachen.openlap.visualizer.model.TransformedData;
  */
 public abstract class DataTransformer {
 
-    private OLAPDataSet input;
-    private OLAPDataSet output;
-
-    protected DataTransformer(){
-        initializeDataSetConfiguration();
-    }
-
-    protected abstract void initializeDataSetConfiguration();
     /**
      * @param olapDataSet The dataset which needs to be transformed in a
      *                    dataset that is understood by the visualization code
@@ -26,21 +18,4 @@ public abstract class DataTransformer {
      * */
     public abstract TransformedData transformData(OLAPDataSet olapDataSet);
 
-    public abstract boolean isDataTransformable(OLAPPortConfiguration olapPortConfiguration) throws DataSetValidationException;
-
-    public OLAPDataSet getInput() {
-        return input;
-    }
-
-    public void setInput(OLAPDataSet input) {
-        this.input = input;
-    }
-
-    public OLAPDataSet getOutput() {
-        return output;
-    }
-
-    public void setOutput(OLAPDataSet output) {
-        this.output = output;
-    }
 }

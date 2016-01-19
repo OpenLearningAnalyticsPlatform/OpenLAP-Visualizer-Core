@@ -5,7 +5,7 @@ import DataSet.OLAPDataSet;
 import de.rwthaachen.openlap.visualizer.model.TransformedBarChartD3Data;
 import de.rwthaachen.openlap.visualizer.model.TransformedData;
 
-public class BarChartDataTransformer extends DataTransformer {
+public class BarChartDataTransformer implements DataTransformer {
 
     @Override
     public TransformedData transformData(OLAPDataSet olapDataSet) {

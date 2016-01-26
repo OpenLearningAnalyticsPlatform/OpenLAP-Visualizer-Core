@@ -54,10 +54,10 @@ public class VisualizationEngineService {
             //visualization method found
             VisualizationMethod visMethod = visualizationMethod.get();
             //ask the factories for the instances
-            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
-            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
-            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClassName());
-            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClassName());
+            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(visualizationFramework.getFrameworkLocation());
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationFramework.getFrameworkLocation());
+            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClass());
+            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClass());
             return codeGenerator.generateVisualizationCode(dataSet, dataTransformer);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + methodName + " for the framework: " + frameworkName + " was not found");
@@ -84,10 +84,10 @@ public class VisualizationEngineService {
         if (visualizationMethod.isPresent()) {
             VisualizationMethod visMethod = visualizationMethod.get();
             //ask the factories for the instances
-            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
-            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(configurationService.getVisualizationFrameworksJarStorageLocation());
-            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClassName());
-            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClassName());
+            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(visualizationFramework.getFrameworkLocation());
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationFramework.getFrameworkLocation());
+            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClass());
+            DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClass());
             return codeGenerator.generateVisualizationCode(olapDataSet, dataTransformer);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + methodId + " for the framework: " + frameworkId + " was not found");

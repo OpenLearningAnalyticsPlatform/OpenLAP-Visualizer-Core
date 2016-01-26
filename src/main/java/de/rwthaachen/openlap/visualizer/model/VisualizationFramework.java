@@ -18,8 +18,8 @@ import java.util.List;
 public class VisualizationFramework {
     @Column(unique = true, nullable = false, name = "VIS_FRAMEWORK_NAME")
     String name;
-    @Column(nullable = false, name = "VIS_FRAMEWORK_UPLOADER")
-    String uploadedBy;
+    @Column(nullable = false, name = "VIS_FRAMEWORK_IMPLEMENTOR")
+    String creator;
     @Column(name = "VIS_FRAMEWORK_DESCRIPTION")
     String description;
     @Column(nullable = false, name = "VIS_FRAMEWORK_LOCATION")
@@ -36,10 +36,10 @@ public class VisualizationFramework {
         visualizationMethods = new ArrayList<>();
     }
 
-    public VisualizationFramework(String name, String uploadedBy, String description, String frameworkLocation) {
+    public VisualizationFramework(String name, String creator, String description, String frameworkLocation) {
         this();
         this.name = name;
-        this.uploadedBy = uploadedBy;
+        this.creator = creator;
         this.description = description;
         this.frameworkLocation = frameworkLocation;
     }
@@ -60,12 +60,12 @@ public class VisualizationFramework {
         this.name = name;
     }
 
-    public String getUploadedBy() {
-        return uploadedBy;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setUploadedBy(String uploadedBy) {
-        this.uploadedBy = uploadedBy;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public String getDescription() {
@@ -94,7 +94,7 @@ public class VisualizationFramework {
 
     @Override
     public String toString() {
-        return "Vis Framework details :[id:" + id + ",name:" + name + ",uploadedBy:" + uploadedBy + ",description:" + description + ",location:" + frameworkLocation + "]";
+        return "Vis Framework details :[id:" + id + ",name:" + name + ",creator:" + creator + ",description:" + description + ",location:" + frameworkLocation + "]";
     }
 
     @Override
@@ -106,7 +106,7 @@ public class VisualizationFramework {
 
         if (id != that.id) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (uploadedBy != null ? !uploadedBy.equals(that.uploadedBy) : that.uploadedBy != null) return false;
+        if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (frameworkLocation != null ? !frameworkLocation.equals(that.frameworkLocation) : that.frameworkLocation != null)
             return false;
@@ -117,7 +117,7 @@ public class VisualizationFramework {
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (uploadedBy != null ? uploadedBy.hashCode() : 0);
+        result = 31 * result + (creator != null ? creator.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (frameworkLocation != null ? frameworkLocation.hashCode() : 0);
         result = 31 * result + (int) (id ^ (id >>> 32));

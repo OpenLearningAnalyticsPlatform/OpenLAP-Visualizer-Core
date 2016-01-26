@@ -18,7 +18,7 @@ public class DataTransformerMethod {
     @Column(name = "TRANSFORMER_METHOD_ID")
     private long id;
     @Column(nullable = false, name = "TRANSFORMER_METHOD_IMPLEMENTING_CLASS")
-    private String implementingClassName;
+    private String implementingClass;
     @Column(nullable = false, name = "TRANSFORMER_METHOD_NAME")
     private String name;
     @OneToOne(mappedBy = "dataTransformerMethod")
@@ -30,7 +30,7 @@ public class DataTransformerMethod {
     public DataTransformerMethod(String name, String implementingClass) {
         this();
         this.name = name;
-        this.implementingClassName = implementingClass;
+        this.implementingClass = implementingClass;
     }
 
     public long getId() {
@@ -42,12 +42,20 @@ public class DataTransformerMethod {
         this.id = id;
     }
 
-    public String getImplementingClassName() {
-        return implementingClassName;
+    public String getImplementingClass() {
+        return implementingClass;
     }
 
-    public void setImplementingClassName(String implementingClassName) {
-        this.implementingClassName = implementingClassName;
+    public void setImplementingClass(String implementingClass) {
+        this.implementingClass = implementingClass;
+    }
+
+    public VisualizationMethod getVisualizationMethod() {
+        return visualizationMethod;
+    }
+
+    public void setVisualizationMethod(VisualizationMethod visualizationMethod) {
+        this.visualizationMethod = visualizationMethod;
     }
 
     public String getName() {
@@ -66,7 +74,7 @@ public class DataTransformerMethod {
         DataTransformerMethod that = (DataTransformerMethod) o;
 
         if (id != that.id) return false;
-        if (implementingClassName != null ? !implementingClassName.equals(that.implementingClassName) : that.implementingClassName != null)
+        if (implementingClass != null ? !implementingClass.equals(that.implementingClass) : that.implementingClass != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         return visualizationMethod != null ? visualizationMethod.equals(that.visualizationMethod) : that.visualizationMethod == null;
@@ -76,7 +84,7 @@ public class DataTransformerMethod {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (implementingClassName != null ? implementingClassName.hashCode() : 0);
+        result = 31 * result + (implementingClass != null ? implementingClass.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (visualizationMethod != null ? visualizationMethod.hashCode() : 0);
         return result;

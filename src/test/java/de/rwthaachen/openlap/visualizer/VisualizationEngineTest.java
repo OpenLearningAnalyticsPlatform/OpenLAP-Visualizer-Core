@@ -19,11 +19,14 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.Charset;
 
+/**
+ * Created by bas on 12/1/15.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = OpenLAPVisualizerApplication.class)
 @WebAppConfiguration
 @ActiveProfiles("development")
-public class DefaultEndpointTest {
+public class VisualizationEngineTest {
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
@@ -31,7 +34,6 @@ public class DefaultEndpointTest {
     private ObjectMapper objectMapper;
     @Autowired
     private WebApplicationContext webApplicationContext;
-
 
     @Before
     public void setup() throws Exception {

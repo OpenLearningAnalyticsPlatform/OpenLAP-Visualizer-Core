@@ -21,7 +21,7 @@ public class VisualizationMethod {
     private long id;
     @Column(nullable = false, name = "VIS_METHOD_IMPLEMENTING_CLASS")
     @JsonIgnore
-    private String implementingClassName;
+    private String implementingClass;
     @Column(nullable = false, name = "VIS_METHOD_NAME")
     private String name;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,7 +38,7 @@ public class VisualizationMethod {
 
     public VisualizationMethod(String implementingClassName, String name) {
         this();
-        this.implementingClassName = implementingClassName;
+        this.implementingClass = implementingClassName;
         this.name = name;
     }
 
@@ -50,12 +50,12 @@ public class VisualizationMethod {
         this.id = id;
     }
 
-    public String getImplementingClassName() {
-        return implementingClassName;
+    public String getImplementingClass() {
+        return implementingClass;
     }
 
-    public void setImplementingClassName(String implementingClassName) {
-        this.implementingClassName = implementingClassName;
+    public void setImplementingClass(String implementingClass) {
+        this.implementingClass = implementingClass;
     }
 
     public String getName() {
@@ -90,7 +90,7 @@ public class VisualizationMethod {
         VisualizationMethod that = (VisualizationMethod) o;
 
         if (id != that.id) return false;
-        if (implementingClassName != null ? !implementingClassName.equals(that.implementingClassName) : that.implementingClassName != null)
+        if (implementingClass != null ? !implementingClass.equals(that.implementingClass) : that.implementingClass != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (visualizationFramework != null ? !visualizationFramework.equals(that.visualizationFramework) : that.visualizationFramework != null)
@@ -102,7 +102,7 @@ public class VisualizationMethod {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (implementingClassName != null ? implementingClassName.hashCode() : 0);
+        result = 31 * result + (implementingClass != null ? implementingClass.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (visualizationFramework != null ? visualizationFramework.hashCode() : 0);
         result = 31 * result + (dataTransformerMethod != null ? dataTransformerMethod.hashCode() : 0);

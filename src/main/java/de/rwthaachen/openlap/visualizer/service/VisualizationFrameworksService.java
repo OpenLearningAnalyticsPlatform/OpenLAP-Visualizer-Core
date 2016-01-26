@@ -1,17 +1,20 @@
 package de.rwthaachen.openlap.visualizer.service;
 
+import DataSet.OLAPPortConfiguration;
 import de.rwthaachen.openlap.visualizer.dao.VisualizationFrameworkRepository;
 import de.rwthaachen.openlap.visualizer.dao.VisualizationMethodRepository;
-import de.rwthaachen.openlap.visualizer.exceptions.DataRepositoryException;
+import de.rwthaachen.openlap.visualizer.exceptions.DataSetValidationException;
 import de.rwthaachen.openlap.visualizer.exceptions.FileManagerException;
 import de.rwthaachen.openlap.visualizer.exceptions.VisualizationFrameworkDeletionException;
 import de.rwthaachen.openlap.visualizer.exceptions.VisualizationFrameworksUploadException;
+import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
+import de.rwthaachen.openlap.visualizer.framework.factory.VisualizationCodeGeneratorFactory;
+import de.rwthaachen.openlap.visualizer.framework.factory.VisualizationCodeGeneratorFactoryImpl;
 import de.rwthaachen.openlap.visualizer.framework.validators.VisualizationFrameworksUploadValidator;
 import de.rwthaachen.openlap.visualizer.model.DataTransformerMethod;
 import de.rwthaachen.openlap.visualizer.model.VisualizationFramework;
 import de.rwthaachen.openlap.visualizer.model.VisualizationMethod;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -138,16 +141,16 @@ public class VisualizationFrameworksService {
             visualizationMethod.setName(newAttributes.getName());
 
         // update the implementing class
-        if (newAttributes.getImplementingClassName() != null && !newAttributes.getImplementingClassName().isEmpty())
-            visualizationMethod.setImplementingClassName(newAttributes.getImplementingClassName());
+        if (newAttributes.getImplementingClass() != null && !newAttributes.getImplementingClass().isEmpty())
+            visualizationMethod.setImplementingClass(newAttributes.getImplementingClass());
 
         DataTransformerMethod dataTransformerMethod = visualizationMethod.getDataTransformerMethod();
 
         if (newAttributes.getDataTransformerMethod().getName() != null && !newAttributes.getDataTransformerMethod().getName().isEmpty())
             dataTransformerMethod.setName(newAttributes.getDataTransformerMethod().getName());
 
-        if (newAttributes.getDataTransformerMethod().getImplementingClassName() != null && !newAttributes.getDataTransformerMethod().getImplementingClassName().isEmpty())
-            dataTransformerMethod.setImplementingClassName(newAttributes.getDataTransformerMethod().getImplementingClassName());
+        if (newAttributes.getDataTransformerMethod().getImplementingClass() != null && !newAttributes.getDataTransformerMethod().getImplementingClass().isEmpty())
+            dataTransformerMethod.setImplementingClass(newAttributes.getDataTransformerMethod().getImplementingClass());
 
         //finally set the data transformer method
         visualizationMethod.setDataTransformerMethod(dataTransformerMethod);
@@ -166,11 +169,31 @@ public class VisualizationFrameworksService {
     public void updateVisualizationFrameworkAttributes(VisualizationFramework newAttributes, long idOfFramework) {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(idOfFramework);
 
-        if(newAttributes.getDescription()!=null && !newAttributes.getDescription().isEmpty())
+        if (newAttributes.getDescription() != null && !newAttributes.getDescription().isEmpty())
             visualizationFramework.setDescription(newAttributes.getDescription());
-        if(newAttributes.getUploadedBy()!=null && !newAttributes.getUploadedBy().isEmpty())
-            visualizationFramework.setUploadedBy(newAttributes.getUploadedBy());
+        if (newAttributes.getCreator() != null && !newAttributes.getCreator().isEmpty())
+            visualizationFramework.setCreator(newAttributes.getCreator());
 
         visualizationFrameworkRepository.save(visualizationFramework);
+    }
+
+    /**
+     * Validates the configuration of the visualization method (i.e. the inputs that it accepts) with the provided OLAPPortConfiguration.
+     *
+     * @param visualizationMethodId The id of the method for which to validate the configuration
+     * @param olapPortConfiguration The OLAPPortConfiguration against which to validate the method configuration
+     * @return true if the the provided port configuration matches the configuration of the visualization method
+     * @throws DataSetValidationException If the validation encountered an error
+     */
+    public boolean validateVisualizationMethodConfiguration(long visualizationMethodId, OLAPPortConfiguration olapPortConfiguration) throws DataSetValidationException {
+        VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(visualizationMethodId);
+        if (visualizationMethod != null) {
+            //ask the factories for the instance
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
+            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
+            return codeGenerator.isDataProcessable(olapPortConfiguration);
+        } else {
+            throw new DataSetValidationException("The visualization method represented by the id: " + visualizationMethodId + " not found.");
+        }
     }
 }

@@ -29,6 +29,11 @@ public class D3BarChartVisualizationCodeGenerator extends VisualizationCodeGener
     protected String visualizationCode(TransformedData transformedData) {
         TransformedBarChartD3Data transformedBarChartD3Data = (TransformedBarChartD3Data) transformedData;
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js\"></script>");
+        stringBuilder.append("<div id=\"chart\">");
+        stringBuilder.append("<script>");
+
+        stringBuilder.append("</script></div>");
         return null;
     }
 }

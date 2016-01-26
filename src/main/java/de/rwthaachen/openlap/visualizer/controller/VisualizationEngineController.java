@@ -31,15 +31,15 @@ public class VisualizationEngineController {
                 && generateVisualizationCodeRequest.getMethodName() != null && !generateVisualizationCodeRequest.getMethodName().isEmpty())
             visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkName(), generateVisualizationCodeRequest.getMethodName(), generateVisualizationCodeRequest.getDataSet()));
         else
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(),generateVisualizationCodeRequest.getMethodId(),generateVisualizationCodeRequest.getDataSet()));
+            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(), generateVisualizationCodeRequest.getMethodId(), generateVisualizationCodeRequest.getDataSet()));
         return visualizationCodeResponse;
     }
 
     @ExceptionHandler(VisualizationCodeGenerationException.class)
     public ResponseEntity<Object> handleVisCodeGenerationException(VisualizationCodeGenerationException exception, HttpServletRequest request) {
-        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(),"","");
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(error,headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

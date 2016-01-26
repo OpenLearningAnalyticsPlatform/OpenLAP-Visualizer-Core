@@ -28,19 +28,19 @@ public class VisualizationFrameworksUploadValidator {
             @Override
             public boolean test(VisualizationFramework visualizationFramework) {
                 if (visualizationFramework.getName() != null && visualizationFramework.getFrameworkLocation() != null &&
-                        visualizationFramework.getDescription() != null && visualizationFramework.getUploadedBy() != null &&
-                        !visualizationFramework.getName().isEmpty() && !visualizationFramework.getUploadedBy().isEmpty() &&
+                        visualizationFramework.getDescription() != null && visualizationFramework.getCreator() != null &&
+                        !visualizationFramework.getName().isEmpty() && !visualizationFramework.getCreator().isEmpty() &&
                         !visualizationFramework.getDescription().isEmpty() && !visualizationFramework.getFrameworkLocation().isEmpty()
                         && visualizationFramework.getVisualizationMethods() != null) {
                     //lets go deeper into the visualization methods definition
                     if (visualizationFramework.getVisualizationMethods().size() > 0) {
                         for (VisualizationMethod visualizationMethod : visualizationFramework.getVisualizationMethods()) {
-                            if (visualizationMethod.getName() != null && visualizationMethod.getImplementingClassName() != null
-                                    && !visualizationMethod.getName().isEmpty() && !visualizationMethod.getImplementingClassName().isEmpty()
+                            if (visualizationMethod.getName() != null && visualizationMethod.getImplementingClass() != null
+                                    && !visualizationMethod.getName().isEmpty() && !visualizationMethod.getImplementingClass().isEmpty()
                                     && visualizationMethod.getDataTransformerMethod() != null && visualizationMethod.getDataTransformerMethod().getName() != null
-                                    && visualizationMethod.getDataTransformerMethod().getImplementingClassName() != null
+                                    && visualizationMethod.getDataTransformerMethod().getImplementingClass() != null
                                     && !visualizationMethod.getDataTransformerMethod().getName().isEmpty()
-                                    && !visualizationMethod.getDataTransformerMethod().getImplementingClassName().isEmpty()) {
+                                    && !visualizationMethod.getDataTransformerMethod().getImplementingClass().isEmpty()) {
                                 return false; // do not include in the filtered list
                             } else {
                                 return true;
@@ -63,10 +63,10 @@ public class VisualizationFrameworksUploadValidator {
                 for(VisualizationMethod visualizationMethod : visualizationFramework.getVisualizationMethods()){
                     //lets first check the code generator
                     try {
-                        if(visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClassName())==null)
+                        if(visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass())==null)
                             return false;
                         //now the data transformer
-                        if(dataTransformerFactory.createDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClassName())==null)
+                        if(dataTransformerFactory.createDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClass())==null)
                             return false;
                     }catch (DataTransformerCreationException | VisualizationCodeGeneratorCreationException exception){
                         throw new VisualizationFrameworksUploadException(exception.getMessage());

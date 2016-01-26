@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,15 +24,15 @@ import java.nio.charset.Charset;
 @SpringApplicationConfiguration(classes = OpenLAPVisualizerApplication.class)
 @WebAppConfiguration
 @ActiveProfiles("development")
-public class DefaultEndpointTest {
+public class VisualizationFrameworksControllerTests {
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+
     @Autowired
     private WebApplicationContext webApplicationContext;
-
 
     @Before
     public void setup() throws Exception {
@@ -39,12 +40,40 @@ public class DefaultEndpointTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
+
+    /*
     @Test
-    public void testNonExistingEndpoints() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/something")
+    public void uploadVisualizationFramework() {
+
+    }*/
+
+    @Test
+    public void getListOfVisualizationFrameworks() throws Exception{
+        mockMvc.perform(MockMvcRequestBuilders.get("/frameworks/list")
                 .contentType(contentType))
-                .andExpect(MockMvcResultMatchers.status().isNotImplemented())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andDo(MockMvcResultHandlers.print());
     }
+/*
+    @Test
+    public void updateVisualizationFrameworkDetails() {
 
+    }
+
+    @Test
+    public void deleteVisualizationFramework() {
+
+    }
+
+    @Test
+    public void getVisualizationFrameworkDetails() {
+
+    }
+
+    @Test
+    public void validateMethodConfiguration() {
+
+    }
+
+*/
 }

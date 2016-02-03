@@ -1,0 +1,32 @@
+{
+ "dataSet": {
+   "columns": {
+     "users": {
+       "configurationData": {
+         "type": "STRING",
+         "id": "wiki_user",
+         "required": true
+       },
+       "data": [
+         "user1",
+         "user2",
+         "user3",
+         "user4"
+       ]
+     },
+     "count": {
+       "configurationData": {
+         "type": "INT",
+         "id": "num_of_posts",
+         "required": true
+       },
+       "data": [
+         3,
+         5,
+         10,
+         1
+       ]
+     }
+   }
+ }
+}

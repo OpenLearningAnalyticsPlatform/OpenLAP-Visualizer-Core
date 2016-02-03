@@ -12,7 +12,7 @@
             </snapshots>
         </repository>
     </repositories>
-    <groupId>groupId</groupId>
+    <groupId>de.rwthaachen.openlap</groupId>
     <artifactId>ModularVisualizationFramework</artifactId>
     <version>0.1</version>
     <properties>
@@ -27,7 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.OpenLearningAnalyticsPlatform</groupId>
-            <artifactId>OLAPDataset</artifactId>
+            <artifactId>OpenLAP-DataSet</artifactId>
             <version>-SNAPSHOT</version>
         </dependency>
         <dependency>

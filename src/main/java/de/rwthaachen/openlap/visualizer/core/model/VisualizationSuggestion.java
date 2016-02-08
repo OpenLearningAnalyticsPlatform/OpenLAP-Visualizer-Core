@@ -15,7 +15,6 @@ public class VisualizationSuggestion {
     private long id;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "VIS_METHOD_FID")
-    @JsonIgnore
     private VisualizationMethod visualizationMethod;
     @Column(name = "INPUT_COLUMN_CONFIG")
     private String olapDataSetConfiguration;

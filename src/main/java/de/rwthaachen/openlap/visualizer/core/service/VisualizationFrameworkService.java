@@ -1,19 +1,20 @@
 package de.rwthaachen.openlap.visualizer.core.service;
 
 import DataSet.OLAPPortConfiguration;
+import de.rwthaachen.openlap.visualizer.core.dao.DataTransformerMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationFrameworkRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.exceptions.DataSetValidationException;
 import de.rwthaachen.openlap.visualizer.core.exceptions.FileManagerException;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworkDeletionException;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworksUploadException;
-import de.rwthaachen.openlap.visualizer.core.framework.VisualizationCodeGenerator;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactory;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactoryImpl;
 import de.rwthaachen.openlap.visualizer.core.framework.validators.VisualizationFrameworksUploadValidator;
 import de.rwthaachen.openlap.visualizer.core.model.DataTransformerMethod;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
+import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,9 @@ public class VisualizationFrameworkService {
 
     @Autowired
     private VisualizationMethodRepository visualizationMethodRepository;
+
+    @Autowired
+    private DataTransformerMethodRepository dataTransformerMethodRepository;
 
     @Autowired
     private FileManager fileManager;
@@ -78,15 +82,16 @@ public class VisualizationFrameworkService {
      */
     public void uploadVisualizationFrameworks(List<VisualizationFramework> frameworkList, MultipartFile jarFile) throws VisualizationFrameworksUploadException {
         // set the file location in all the framework objects
-        frameworkList.forEach(framework -> framework.setFrameworkLocation(Paths.get(configurationService.getVisualizationFrameworksJarStorageLocation(), jarFile.getName() + configurationService.getJarBundleExtension()).toAbsolutePath().toString()));
+        frameworkList.forEach(framework -> framework.setFrameworkLocation(Paths.get(fileManager.getFileStoragePath(jarFile.getName()).toString()+configurationService.getJarBundleExtension()).toString()));
         //validate the jar classes first before passing it on to the File Manager
         VisualizationFrameworksUploadValidator visualizationFrameworksUploadValidator = new VisualizationFrameworksUploadValidator();
         if (visualizationFrameworksUploadValidator.validateVisualizationFrameworksUploadConfiguration(frameworkList, jarFile)) {
             //if the configuration is valid then perform the upload, i.e db entries and copying of the jar
             // first copy the file over
             try {
-                FileManager fileManager = new FileManager();
-                fileManager.saveFile(jarFile.getName(), jarFile);
+                fileManager.saveJarFile(jarFile.getName(), jarFile);
+                // set the framework in each of the methods as it is a bidirectional relationship
+                frameworkList.forEach(framework -> framework.getVisualizationMethods().forEach(method -> method.setVisualizationFramework(framework)));
                 visualizationFrameworkRepository.save(frameworkList);
             } catch (FileManagerException fileManagerException) {
                 throw new VisualizationFrameworksUploadException(fileManagerException.getMessage());
@@ -105,8 +110,8 @@ public class VisualizationFrameworkService {
      * @return true if the deletion of the framework was successful
      * @throws VisualizationFrameworkDeletionException if the deletion of the framework encountered problems such as the file couldn't be removed
      */
-    @Transactional(rollbackFor = {VisualizationFrameworkDeletionException.class})
-    public void deleteVisualizationFramework(String frameworkId) throws VisualizationFrameworkDeletionException {
+    @Transactional(rollbackFor = {RuntimeException.class})
+    public boolean deleteVisualizationFramework(String frameworkId) throws VisualizationFrameworkDeletionException {
         if (frameworkId == null || frameworkId.isEmpty())
             throw new VisualizationFrameworkDeletionException("The id of the framework to delete should be null or empty string");
         try {
@@ -115,13 +120,22 @@ public class VisualizationFrameworkService {
             VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(idOfFramework);
             if (visualizationFramework == null)
                 throw new VisualizationFrameworkDeletionException("Could not delete the framework with id: " + frameworkId + ", not found");
+            // remove all the database entries
+            visualizationFramework.getVisualizationMethods().forEach(visualizationMethod -> {
+                //for each of the visualization method, delete the data transformer that it points to
+                dataTransformerMethodRepository.delete(visualizationMethod.getDataTransformerMethod().getId());
+            });
+            visualizationFrameworkRepository.delete(idOfFramework);
+            //finally delete the jar
             try {
                 fileManager.deleteFile(visualizationFramework.getFrameworkLocation());
             } catch (FileManagerException fileManagerException) {
                 throw new VisualizationFrameworkDeletionException(fileManagerException.getMessage());
             }
-            // finally remove all the database entries
-            visualizationFrameworkRepository.delete(idOfFramework);
+            if(visualizationFrameworkRepository.exists(idOfFramework))
+                return false;
+            else
+                return true;
         } catch (NumberFormatException numberFormatException) {
             throw new VisualizationFrameworkDeletionException("The id: " + frameworkId + " is not parseable, should be a long value");
         }
@@ -134,7 +148,7 @@ public class VisualizationFrameworkService {
      *                      all other attributes can be updated
      * @param idOfMethod    the id of the visualization method to be updated
      */
-    public void updateVisualizationMethodAttributes(VisualizationMethod newAttributes, long idOfMethod) {
+    public VisualizationMethod updateVisualizationMethodAttributes(VisualizationMethod newAttributes, long idOfMethod) {
         VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(idOfMethod);
         // update the name of the method
         if (newAttributes.getName() != null && !newAttributes.getName().isEmpty())
@@ -144,19 +158,21 @@ public class VisualizationFrameworkService {
         if (newAttributes.getImplementingClass() != null && !newAttributes.getImplementingClass().isEmpty())
             visualizationMethod.setImplementingClass(newAttributes.getImplementingClass());
 
-        DataTransformerMethod dataTransformerMethod = visualizationMethod.getDataTransformerMethod();
+        if(newAttributes.getDataTransformerMethod()!=null){
+            DataTransformerMethod newDataTransformerMethod = dataTransformerMethodRepository.findOne(newAttributes.getDataTransformerMethod().getId());
+            //finally set the data transformer method
+            visualizationMethod.setDataTransformerMethod(newDataTransformerMethod);
+        }
 
-        if (newAttributes.getDataTransformerMethod().getName() != null && !newAttributes.getDataTransformerMethod().getName().isEmpty())
+        //TODO: WRONG, you will modify the datatransformer attributes that other visualization methods are referring to, therefore just change the link b/w the transformer and the vis method
+        /*if (newAttributes.getDataTransformerMethod().getName() != null && !newAttributes.getDataTransformerMethod().getName().isEmpty())
             dataTransformerMethod.setName(newAttributes.getDataTransformerMethod().getName());
 
         if (newAttributes.getDataTransformerMethod().getImplementingClass() != null && !newAttributes.getDataTransformerMethod().getImplementingClass().isEmpty())
-            dataTransformerMethod.setImplementingClass(newAttributes.getDataTransformerMethod().getImplementingClass());
-
-        //finally set the data transformer method
-        visualizationMethod.setDataTransformerMethod(dataTransformerMethod);
+            dataTransformerMethod.setImplementingClass(newAttributes.getDataTransformerMethod().getImplementingClass());*/
 
         //commit the changes
-        visualizationMethodRepository.save(visualizationMethod);
+        return visualizationMethodRepository.save(visualizationMethod);
     }
 
     /**
@@ -166,7 +182,7 @@ public class VisualizationFrameworkService {
      *                      updated
      * @param idOfFramework the id of the visualization framework to be updated
      */
-    public void updateVisualizationFrameworkAttributes(VisualizationFramework newAttributes, long idOfFramework) {
+    public VisualizationFramework updateVisualizationFrameworkAttributes(VisualizationFramework newAttributes, long idOfFramework) {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(idOfFramework);
 
         if (newAttributes.getDescription() != null && !newAttributes.getDescription().isEmpty())
@@ -174,7 +190,7 @@ public class VisualizationFrameworkService {
         if (newAttributes.getCreator() != null && !newAttributes.getCreator().isEmpty())
             visualizationFramework.setCreator(newAttributes.getCreator());
 
-        visualizationFrameworkRepository.save(visualizationFramework);
+        return visualizationFrameworkRepository.save(visualizationFramework);
     }
 
     /**

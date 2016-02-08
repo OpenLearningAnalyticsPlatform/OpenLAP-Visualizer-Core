@@ -1,7 +1,7 @@
 package de.rwthaachen.openlap.visualizer.core.framework.factory;
 
 import de.rwthaachen.openlap.visualizer.core.exceptions.DataTransformerCreationException;
-import de.rwthaachen.openlap.visualizer.core.framework.DataTransformer;
+import de.rwthaachen.openlap.visualizer.framework.DataTransformer;
 
 /**
  * The interface specifying the Factory functions for creating the DataTransformer objects

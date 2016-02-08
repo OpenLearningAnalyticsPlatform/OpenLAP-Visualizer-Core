@@ -1,16 +1,18 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.response;
 
+import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
+
 /**
  * Created by bas on 11/17/15.
  */
 public class UpdateVisualizationFrameworkResponse {
-    private boolean success;
+    private VisualizationFramework visualizationFramework;
 
-    public boolean getSuccess() {
-        return success;
+    public VisualizationFramework getVisualizationFramework() {
+        return visualizationFramework;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public void setVisualizationFramework(VisualizationFramework visualizationFramework) {
+        this.visualizationFramework = visualizationFramework;
     }
 }

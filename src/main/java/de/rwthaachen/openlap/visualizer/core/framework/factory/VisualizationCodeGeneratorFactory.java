@@ -1,7 +1,7 @@
 package de.rwthaachen.openlap.visualizer.core.framework.factory;
 
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationCodeGeneratorCreationException;
-import de.rwthaachen.openlap.visualizer.core.framework.VisualizationCodeGenerator;
+import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
 
 /**
  * The interface specifying the Factory functions for creating the VisualizationCodeGenerator objects

@@ -1,0 +1,19 @@
+{
+  "visualizationFrameworks": [
+    {
+      "name": "d3jsVis",
+      "creator": "Bassim Bashir",
+      "description": "A framework providing great visualizations",
+      "visualizationMethods": [
+        {
+          "name": "Bar Chart",
+          "implementingClass": "de.rwthaachen.openlap.D3BarChartVisualizationCodeGenerator",
+          "dataTransformerMethod": {
+            "name": "BarChart DataTransformer",
+            "implementingClass": "de.rwthaachen.openlap.BarChartDataTransformer"
+          }
+        }
+      ]
+    }
+  ]
+}

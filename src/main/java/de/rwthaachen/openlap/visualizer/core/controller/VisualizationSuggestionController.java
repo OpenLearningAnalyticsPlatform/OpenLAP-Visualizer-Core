@@ -37,8 +37,7 @@ public class VisualizationSuggestionController {
     @RequestMapping(value = "/{idOfSuggestion}/update", method = RequestMethod.PUT)
     public UpdateVisualizationSuggestionResponse updateVisualizationSuggestion(@PathVariable Long idOfSuggestion, @RequestBody UpdateVisualizationSuggestionRequest request) {
         UpdateVisualizationSuggestionResponse response = new UpdateVisualizationSuggestionResponse();
-        visualizationSuggestionService.updateVisualizationSuggestionAttributes(idOfSuggestion,request.getVisualizationSuggestion());
-        response.setSuccess(true);
+        response.setVisualizationSuggestion(visualizationSuggestionService.updateVisualizationSuggestionAttributes(idOfSuggestion,request.getVisualizationSuggestion()));
         return response;
     }
 
@@ -53,8 +52,7 @@ public class VisualizationSuggestionController {
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public AddNewVisualizationSuggestionResponse createVisualizationSuggestion(@RequestBody AddNewVisualizationSuggestionRequest request) {
         AddNewVisualizationSuggestionResponse response = new AddNewVisualizationSuggestionResponse();
-        long idOfNewSuggestion = visualizationSuggestionService.createVisualizationSuggestion(request.getVisualizationMethodId(),request.getOlapDataSet());
-        response.setSuggestionId(idOfNewSuggestion);
+        response.setVisualizationSuggestion(visualizationSuggestionService.createVisualizationSuggestion(request.getVisualizationMethodId(),request.getOlapDataSet()));
         return response;
     }
 

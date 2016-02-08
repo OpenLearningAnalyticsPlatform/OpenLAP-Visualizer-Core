@@ -1,8 +1,11 @@
 package de.rwthaachen.openlap.visualizer.core.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import de.rwthaachen.openlap.visualizer.core.dtos.error.BaseErrorDTO;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationFrameworkRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationMethodRequest;
+import de.rwthaachen.openlap.visualizer.core.dtos.request.UploadVisualizationFrameworksRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.ValidateVisualizationMethodConfigurationRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.*;
 import de.rwthaachen.openlap.visualizer.core.exceptions.DataSetValidationException;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -32,16 +36,14 @@ public class VisualizationFrameworkController {
     @RequestMapping(value = "/{idOfFramework}/update", method = RequestMethod.PUT)
     public UpdateVisualizationFrameworkResponse updateVisualizationFramework(@PathVariable Long idOfFramework, @RequestBody UpdateVisualizationFrameworkRequest updateVisualizationFrameworkRequest) {
         UpdateVisualizationFrameworkResponse response = new UpdateVisualizationFrameworkResponse();
-        visualizationFrameworkService.updateVisualizationFrameworkAttributes(updateVisualizationFrameworkRequest.getVisualizationFramework(), idOfFramework);
-        response.setSuccess(true);
+        response.setVisualizationFramework(visualizationFrameworkService.updateVisualizationFrameworkAttributes(updateVisualizationFrameworkRequest.getVisualizationFramework(), idOfFramework));
         return response;
     }
 
     @RequestMapping(value = "/{idOfFramework}", method = RequestMethod.DELETE)
     public DeleteVisualizationFrameworkResponse deleteVisualizationFramework(@PathVariable String idOfFramework) {
-        visualizationFrameworkService.deleteVisualizationFramework(idOfFramework);
         DeleteVisualizationFrameworkResponse response = new DeleteVisualizationFrameworkResponse();
-        response.setSuccess(true);
+        response.setSuccess(visualizationFrameworkService.deleteVisualizationFramework(idOfFramework));
         return response;
     }
 
@@ -55,11 +57,17 @@ public class VisualizationFrameworkController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public UploadVisualizationFrameworkResponse uploadNewVisualizationFramework(@RequestParam("frameworkJarBundle") MultipartFile frameworkJarBundle,
-                                                                                @RequestParam("frameworkConfiguration") List<VisualizationFramework> frameworkConfigurations) {
-        visualizationFrameworkService.uploadVisualizationFrameworks(frameworkConfigurations, frameworkJarBundle);
-        UploadVisualizationFrameworkResponse response = new UploadVisualizationFrameworkResponse();
-        response.setSuccess(true);
-        return response;
+                                                                                @RequestParam ("frameworkConfig") String frameworksUploadRequest) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            UploadVisualizationFrameworksRequest request = objectMapper.readValue(frameworksUploadRequest, UploadVisualizationFrameworksRequest.class);
+            visualizationFrameworkService.uploadVisualizationFrameworks(request.getVisualizationFrameworks(), frameworkJarBundle);
+            UploadVisualizationFrameworkResponse response = new UploadVisualizationFrameworkResponse();
+            response.setSuccess(true);
+            return response;
+        }catch (IOException ioexception){
+            throw new VisualizationFrameworksUploadException("Frameworks config not properly formed : "+ioexception.getMessage());
+        }
 
     }
 
@@ -70,7 +78,7 @@ public class VisualizationFrameworkController {
         if (visualizationMethod != null)
             response.setVisualizationMethod(visualizationMethod);
         else
-            response.setVisualizationMethod(new VisualizationMethod("", ""));
+            response.setVisualizationMethod(new VisualizationMethod("", "",null,null));
         return response;
     }
 
@@ -80,8 +88,7 @@ public class VisualizationFrameworkController {
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.PUT)
     public UpdateVisualizationMethodResponse updateVisualizationFrameworkMethod(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod, @RequestBody UpdateVisualizationMethodRequest updateVisualizationMethodRequest) {
         UpdateVisualizationMethodResponse response = new UpdateVisualizationMethodResponse();
-        visualizationFrameworkService.updateVisualizationMethodAttributes(updateVisualizationMethodRequest.getVisualizationMethod(), idOfMethod);
-        response.setSuccess(true);
+        response.setVisualizationMethod(visualizationFrameworkService.updateVisualizationMethodAttributes(updateVisualizationMethodRequest.getVisualizationMethod(), idOfMethod));
         return response;
     }
 

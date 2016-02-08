@@ -1,8 +1,10 @@
 package de.rwthaachen.openlap.visualizer.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * The model representing the Data Transformer (Data Adapters) concrete implementations
@@ -17,18 +19,18 @@ public class DataTransformerMethod {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "TRANSFORMER_METHOD_ID")
     private long id;
-    @Column(nullable = false, name = "TRANSFORMER_METHOD_IMPLEMENTING_CLASS")
+    @Column(nullable = false, name = "TRANSFORMER_METHOD_IMPLEMENTING_CLASS", unique = true)
     private String implementingClass;
     @Column(nullable = false, name = "TRANSFORMER_METHOD_NAME")
     private String name;
-    @OneToOne(mappedBy = "dataTransformerMethod")
-    private VisualizationMethod visualizationMethod;
+    @OneToMany(mappedBy = "dataTransformerMethod", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    private List<VisualizationMethod> visualizationMethods;
 
     public DataTransformerMethod() {
     }
 
     public DataTransformerMethod(String name, String implementingClass) {
-        this();
         this.name = name;
         this.implementingClass = implementingClass;
     }
@@ -50,13 +52,6 @@ public class DataTransformerMethod {
         this.implementingClass = implementingClass;
     }
 
-    public VisualizationMethod getVisualizationMethod() {
-        return visualizationMethod;
-    }
-
-    public void setVisualizationMethod(VisualizationMethod visualizationMethod) {
-        this.visualizationMethod = visualizationMethod;
-    }
 
     public String getName() {
         return name;
@@ -64,6 +59,14 @@ public class DataTransformerMethod {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<VisualizationMethod> getVisualizationMethods() {
+        return visualizationMethods;
+    }
+
+    public void setVisualizationMethods(List<VisualizationMethod> visualizationMethods) {
+        this.visualizationMethods = visualizationMethods;
     }
 
     @Override
@@ -77,7 +80,7 @@ public class DataTransformerMethod {
         if (implementingClass != null ? !implementingClass.equals(that.implementingClass) : that.implementingClass != null)
             return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return visualizationMethod != null ? visualizationMethod.equals(that.visualizationMethod) : that.visualizationMethod == null;
+        return visualizationMethods != null ? visualizationMethods.equals(that.visualizationMethods) : that.visualizationMethods == null;
 
     }
 
@@ -86,7 +89,7 @@ public class DataTransformerMethod {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (implementingClass != null ? implementingClass.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (visualizationMethod != null ? visualizationMethod.hashCode() : 0);
+        result = 31 * result + (visualizationMethods != null ? visualizationMethods.hashCode() : 0);
         return result;
     }
 }

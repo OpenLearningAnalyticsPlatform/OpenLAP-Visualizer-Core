@@ -1,26 +1,27 @@
 {
- "dataSet": {
    "columns": {
      "users": {
        "configurationData": {
          "type": "STRING",
-         "id": "wiki_user",
+         "id": "labels",
          "required": true
        },
        "data": [
-         "user1",
-         "user2",
-         "user3",
-         "user4"
+         "Sport Activity",
+         "Gym",
+         "Football",
+         "Rugby",
+         "Swimming"
        ]
      },
      "count": {
        "configurationData": {
-         "type": "INT",
-         "id": "num_of_posts",
+         "type": "INTEGER",
+         "id": "frequencies",
          "required": true
        },
        "data": [
+         "Frequency",
          3,
          5,
          10,
@@ -28,5 +29,4 @@
        ]
      }
    }
- }
 }

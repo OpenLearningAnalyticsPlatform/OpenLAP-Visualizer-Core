@@ -19,27 +19,26 @@ public class VisualizationMethod {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "VIS_METHOD_ID")
     private long id;
-    @Column(nullable = false, name = "VIS_METHOD_IMPLEMENTING_CLASS")
-    @JsonIgnore
+    @Column(nullable = false, name = "VIS_METHOD_IMPLEMENTING_CLASS", unique = true)
     private String implementingClass;
     @Column(nullable = false, name = "VIS_METHOD_NAME")
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "VIS_FRAMEWORK_FID")
+    @ManyToOne
     @JsonIgnore
     private VisualizationFramework visualizationFramework;
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "DATA_TRANSFORMER_METHOD_FID")
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private DataTransformerMethod dataTransformerMethod;
 
     public VisualizationMethod() {
     }
 
-    public VisualizationMethod(String implementingClassName, String name) {
-        this();
+    public VisualizationMethod(String implementingClassName, String name,VisualizationFramework visualizationFramework, DataTransformerMethod dataTransformerMethod) {
         this.implementingClass = implementingClassName;
+        this.visualizationFramework = visualizationFramework;
         this.name = name;
+        this.dataTransformerMethod = dataTransformerMethod;
     }
 
     public long getId() {

@@ -30,7 +30,7 @@ public class FileManager {
      * @param fileToSave The file to save
      * @throws FileManagerException If the saving of the file was not successful
      */
-    public void saveFile(String fileName, MultipartFile fileToSave) throws FileManagerException {
+    public void saveJarFile(String fileName, MultipartFile fileToSave) throws FileManagerException {
         if (configurationService.getFileManagerStorageLocation() == null || fileToSave == null || configurationService.getFileManagerStorageLocation().isEmpty())
             throw new FileManagerException("Saving file failed");
         if (fileToSave.isEmpty())
@@ -38,6 +38,7 @@ public class FileManager {
         // if the filename is not provided then take the name of the provided jar file
         if (fileName == null || fileName.isEmpty())
             fileName = fileToSave.getName();
+        fileName+=configurationService.getJarBundleExtension(); //add the JAR extension
 
         try {
             //create the the file storage directory if it does not exist
@@ -45,8 +46,11 @@ public class FileManager {
             if (!directory.exists())
                 directory.mkdir();
             //first copy to a temp directory and then use the ATOMIC_MOVE to avoid any thread issues
-            Path fileTemporaryStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation(), configurationService.getFileManagerTempStorageLocation(), fileName);
-            Files.copy(fileToSave.getInputStream(), fileTemporaryStorageLocation, StandardCopyOption.REPLACE_EXISTING);
+            Path fileTemporaryStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation(), configurationService.getFileManagerTempStorageLocation());
+            if(!fileTemporaryStorageLocation.toFile().exists())
+                fileTemporaryStorageLocation.toFile().mkdir();
+            fileToSave.transferTo(Paths.get(fileTemporaryStorageLocation.toString(),fileName).toFile());
+            //Files.copy(fileToSave.getInputStream(), fileTemporaryStorageLocation, StandardCopyOption.REPLACE_EXISTING);
             try {
                 Files.move(fileTemporaryStorageLocation.resolve(fileName), Paths.get(configurationService.getFileManagerStorageLocation(), fileName), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException atomicMoveNotSupported) {
@@ -56,6 +60,10 @@ public class FileManager {
         } catch (IOException | SecurityException exception) {
             throw new FileManagerException(exception.getMessage());
         }
+    }
+
+    public Path getFileStoragePath(String fileName){
+        return Paths.get(configurationService.getFileManagerStorageLocation(),fileName);
     }
 
     /**
@@ -76,7 +84,7 @@ public class FileManager {
      * @throws FileManagerException If the file could not be deleted
      */
     public void deleteFile(String fileToDelete) throws FileManagerException {
-        Path filePath = Paths.get(configurationService.getFileManagerStorageLocation(), fileToDelete);
+        Path filePath = Paths.get(fileToDelete);
         try {
             Files.delete(filePath);
         } catch (IOException exception) {

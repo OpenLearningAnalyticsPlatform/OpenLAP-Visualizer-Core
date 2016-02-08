@@ -85,7 +85,7 @@ public class VisualizationSuggestionService {
             throw new VisualizationSuggestionException("Visualization suggestion with id: " + suggestionId + " not found.");
     }
 
-    public void updateVisualizationSuggestionAttributes(long suggestionId, VisualizationSuggestion newAttributes) throws VisualizationSuggestionException{
+    public VisualizationSuggestion updateVisualizationSuggestionAttributes(long suggestionId, VisualizationSuggestion newAttributes) throws VisualizationSuggestionException{
         if(visualizationSuggestionRepository.exists(suggestionId)){
             VisualizationSuggestion suggestionToUpdate = visualizationSuggestionRepository.findOne(suggestionId);
             if(newAttributes.getVisualizationMethod()!=null) {
@@ -99,14 +99,14 @@ public class VisualizationSuggestionService {
             if(newAttributes.getOlapDataSetConfiguration()!=null && !newAttributes.getOlapDataSetConfiguration().isEmpty())
                 suggestionToUpdate.setOlapDataSetConfiguration(newAttributes.getOlapDataSetConfiguration());
 
-            visualizationSuggestionRepository.save(suggestionToUpdate);
+           return visualizationSuggestionRepository.save(suggestionToUpdate);
         }
         else{
             throw new VisualizationSuggestionException("The suggestion with the id: "+suggestionId+" does not exist. Update failed.");
         }
     }
 
-    public Long createVisualizationSuggestion(long visualizationMethodId, OLAPDataSet dataSet) throws VisualizationSuggestionException{
+    public VisualizationSuggestion createVisualizationSuggestion(long visualizationMethodId, OLAPDataSet dataSet) throws VisualizationSuggestionException{
         if(visualizationMethodRepository.exists(visualizationMethodId)){
             if(dataSet != null){
                 VisualizationSuggestion newVisualizationSuggestion =  new VisualizationSuggestion();
@@ -114,8 +114,7 @@ public class VisualizationSuggestionService {
                 newVisualizationSuggestion.setVisualizationMethod(visualizationMethod);
                 try {
                     newVisualizationSuggestion.setOlapDataSetConfiguration(objectMapper.writeValueAsString(dataSet));
-                    newVisualizationSuggestion = visualizationSuggestionRepository.save(newVisualizationSuggestion);
-                    return newVisualizationSuggestion.getId();
+                    return visualizationSuggestionRepository.save(newVisualizationSuggestion);
                 }catch(JsonProcessingException exception){
                     throw new VisualizationSuggestionException("Creation of a new visualization suggestion failed, could not serialize the provided OLAPDataset.");
                 }

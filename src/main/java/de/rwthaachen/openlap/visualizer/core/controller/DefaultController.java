@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controller which contains the code to send as a response for any unmapped requests
- */
 @RestController
 public class DefaultController {
     @RequestMapping("/**")
@@ -32,3 +31,4 @@ public class DefaultController {
         return new ResponseEntity<>(error,headers,HttpStatus.NOT_IMPLEMENTED);
     }
 }
+*/

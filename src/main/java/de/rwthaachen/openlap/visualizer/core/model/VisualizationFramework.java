@@ -29,7 +29,7 @@ public class VisualizationFramework {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "VIS_FRAMEWORK_ID")
     private long id;
-    @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VisualizationMethod> visualizationMethods;
 
     public VisualizationFramework() {
@@ -37,11 +37,11 @@ public class VisualizationFramework {
     }
 
     public VisualizationFramework(String name, String creator, String description, String frameworkLocation) {
-        this();
         this.name = name;
         this.creator = creator;
         this.description = description;
         this.frameworkLocation = frameworkLocation;
+        this.visualizationMethods = new ArrayList<>();
     }
 
     public long getId() {

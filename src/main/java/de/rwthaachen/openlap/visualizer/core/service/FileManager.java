@@ -29,15 +29,18 @@ public class FileManager {
      * @param fileName   The custom name of the file. If the name is null or empty then the name of the provided file will be used
      * @param fileToSave The file to save
      * @throws FileManagerException If the saving of the file was not successful
+     * @return The absolute location where the file is stored
      */
-    public void saveJarFile(String fileName, MultipartFile fileToSave) throws FileManagerException {
+    public String saveJarFile(String fileName, MultipartFile fileToSave) throws FileManagerException {
         if (configurationService.getFileManagerStorageLocation() == null || fileToSave == null || configurationService.getFileManagerStorageLocation().isEmpty())
             throw new FileManagerException("Saving file failed");
         if (fileToSave.isEmpty())
             throw new FileManagerException("The file has no contents");
-        // if the filename is not provided then take the name of the provided jar file
-        if (fileName == null || fileName.isEmpty())
-            fileName = fileToSave.getName();
+        // if the filename is not provided
+        if (fileName == null || fileName.isEmpty()){
+            // then generate one with the timestamp
+            fileName = "jar_"+fileToSave.getName()+"_"+System.currentTimeMillis();
+        }
         fileName+=configurationService.getJarBundleExtension(); //add the JAR extension
 
         try {
@@ -49,21 +52,19 @@ public class FileManager {
             Path fileTemporaryStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation(), configurationService.getFileManagerTempStorageLocation());
             if(!fileTemporaryStorageLocation.toFile().exists())
                 fileTemporaryStorageLocation.toFile().mkdir();
+
             fileToSave.transferTo(Paths.get(fileTemporaryStorageLocation.toString(),fileName).toFile());
-            //Files.copy(fileToSave.getInputStream(), fileTemporaryStorageLocation, StandardCopyOption.REPLACE_EXISTING);
+            Path fileFinalPath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName);
             try {
-                Files.move(fileTemporaryStorageLocation.resolve(fileName), Paths.get(configurationService.getFileManagerStorageLocation(), fileName), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                Files.move(fileTemporaryStorageLocation.resolve(fileName), fileFinalPath , StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException atomicMoveNotSupported) {
                 //if the atomic move didn't work then try copying over the file
-                Files.copy(fileTemporaryStorageLocation.resolve(fileName), Paths.get(configurationService.getFileManagerStorageLocation(), fileName), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(fileTemporaryStorageLocation.resolve(fileName), fileFinalPath, StandardCopyOption.REPLACE_EXISTING);
             }
+            return fileFinalPath.toString();
         } catch (IOException | SecurityException exception) {
             throw new FileManagerException(exception.getMessage());
         }
-    }
-
-    public Path getFileStoragePath(String fileName){
-        return Paths.get(configurationService.getFileManagerStorageLocation(),fileName);
     }
 
     /**

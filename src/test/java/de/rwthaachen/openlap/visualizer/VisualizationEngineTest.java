@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.GenerateVisualizationCodeRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.GenerateVisualizationCodeResponse;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.VisualizationFrameworksDetailsResponse;
+import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
+import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.Random;
 
 import static junit.framework.TestCase.fail;
@@ -42,7 +45,7 @@ public class VisualizationEngineTest {
     private static final Logger log =
             LoggerFactory.getLogger(OpenLAPVisualizerApplication.class);
     private static String GENERATE_VIS_CODE_ENDPOINT = "/generateVisualizationCode";
-    private static String SAMPLE_OLAP_TEST_DATASET_FILE = "olapValidDataSetGooglePieChart.json";
+    private static String D3_BAR_CHART_SAMPLE_OLAP_DATASET = "olapValidDataSetD3BarChart.json";
     private static String GOOGLE_PIE_CHART_SAMPLE_OLAP_DATASET = "olapValidDataSetGooglePieChart.json";
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -61,38 +64,56 @@ public class VisualizationEngineTest {
     }
 
 
+    public void generateVisualizationCode(String olapDataSetSampleFile, String frameworkName, String methodName) throws Exception{
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(VisualizationFrameworkControllerTest.GET_FRAMEWORKS_LIST_ENDPOINT)
+                .contentType(contentType))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+        VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworksDetailsResponse.class);
+        log.info("List of frameworks : " + objectWriter.writeValueAsString(visualizationFrameworksDetailsResponse));
+        if (visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size() == 0) {
+            log.error("No Visualization Frameworks exist, cannot update. Endpoint test : " + VisualizationFrameworkControllerTest.GET_FRAMEWORKS_LIST_ENDPOINT + " failed");
+            fail("No Visualization Frameworks exist, code generation cannot proceed.");
+        }
+        Optional<VisualizationFramework> visualizationFramework = visualizationFrameworksDetailsResponse.getVisualizationFrameworks()
+                .stream()
+                .filter((framework) -> framework.getName().equals(frameworkName))
+                .findFirst();
+        if(visualizationFramework.isPresent()){
+            OLAPDataSet sampleDataSet = objectMapper.readValue(new File(getClass().getClassLoader().getResource(olapDataSetSampleFile).toURI()), OLAPDataSet.class);
+            GenerateVisualizationCodeRequest generateVisualizationCodeRequest = new GenerateVisualizationCodeRequest();
+            generateVisualizationCodeRequest.setDataSet(sampleDataSet);
+            generateVisualizationCodeRequest.setFrameworkId(visualizationFramework.get().getId());
+            Optional<VisualizationMethod> visualizationMethod = visualizationFramework.get().getVisualizationMethods()
+                    .stream()
+                    .filter((method) -> method.getName().equals(methodName))
+                    .findFirst();
+            if(visualizationMethod.isPresent()){
+                generateVisualizationCodeRequest.setMethodId(visualizationMethod.get().getId());
+                // now make the request to get the client visualization code
+                mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(GENERATE_VIS_CODE_ENDPOINT)
+                        .contentType(contentType)
+                        .content(objectMapper.writeValueAsString(generateVisualizationCodeRequest)))
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andReturn();
+                GenerateVisualizationCodeResponse generateVisualizationCodeResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), GenerateVisualizationCodeResponse.class);
+                log.info("Generated visualization code: "+objectMapper.writeValueAsString(generateVisualizationCodeResponse));
+            }else{
+                log.error("Visualization method with name: "+methodName+" not found for framework: "+frameworkName);
+                fail("Visualization method with name: "+methodName+" not found for framework: "+frameworkName);
+            }
+        }else{
+            log.error("Visualization framework with the name : "+frameworkName+" not found");
+            fail("Visualization framework with the name : "+frameworkName+" not found");
+        }
+    }
+
     @Test
     public void visualizationCodeGenerationTest(){
         try {
             logTestHeader(GENERATE_VIS_CODE_ENDPOINT);
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(VisualizationFrameworkControllerTest.GET_FRAMEWORKS_LIST_ENDPOINT)
-                    .contentType(contentType))
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andReturn();
-            VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworksDetailsResponse.class);
-            log.debug("List of frameworks : " + objectWriter.writeValueAsString(visualizationFrameworksDetailsResponse));
-            if (visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size() == 0) {
-                log.error("No Visualization Frameworks exist, cannot update. Endpoint test : " + VisualizationFrameworkControllerTest.GET_FRAMEWORKS_LIST_ENDPOINT + " failed");
-                fail("No Visualization Frameworks exist, code generation cannot proceed.");
-            }
-            //choose one framework from the list at random
-            int randomFrameworkSelectionIndex = new Random().nextInt(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size());
-            OLAPDataSet sampleDataSet = objectMapper.readValue(new File(getClass().getClassLoader().getResource(GOOGLE_PIE_CHART_SAMPLE_OLAP_DATASET).toURI()), OLAPDataSet.class);
-            GenerateVisualizationCodeRequest generateVisualizationCodeRequest = new GenerateVisualizationCodeRequest();
-            generateVisualizationCodeRequest.setDataSet(sampleDataSet);
-            generateVisualizationCodeRequest.setFrameworkId(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomFrameworkSelectionIndex).getId());
-            //choose one vis method of framework at random
-            int randomVisMethodSelectionIndex = new Random().nextInt(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomFrameworkSelectionIndex).getVisualizationMethods().size());
-            generateVisualizationCodeRequest.setMethodId(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomFrameworkSelectionIndex).getVisualizationMethods().get(randomVisMethodSelectionIndex).getId());
-
-            // now make the request to get the client visualization code
-            mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(GENERATE_VIS_CODE_ENDPOINT)
-                    .contentType(contentType)
-                    .content(objectMapper.writeValueAsString(generateVisualizationCodeRequest)))
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andReturn();
-            GenerateVisualizationCodeResponse generateVisualizationCodeResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), GenerateVisualizationCodeResponse.class);
-            log.info("Generated visualization code: "+objectMapper.writeValueAsString(generateVisualizationCodeResponse));
+            generateVisualizationCode(D3_BAR_CHART_SAMPLE_OLAP_DATASET,"d3js","Bar Chart");
+            generateVisualizationCode(GOOGLE_PIE_CHART_SAMPLE_OLAP_DATASET,"Google Charts","Pie Chart");
             logTestFooter(GENERATE_VIS_CODE_ENDPOINT);
         } catch (Exception exception) {
             log.error("Vis code  generation test failed.",exception);
@@ -101,10 +122,10 @@ public class VisualizationEngineTest {
     }
 
     private void logTestHeader(String testEndpointURL) {
-        log.debug("***** Starting test : " + testEndpointURL + " *****");
+        log.info("***** Starting test : " + testEndpointURL + " *****");
     }
 
     private void logTestFooter(String testEndpointURL) {
-        log.debug("***** End of test : " + testEndpointURL + " *****");
+        log.info("***** End of test : " + testEndpointURL + " *****");
     }
 }

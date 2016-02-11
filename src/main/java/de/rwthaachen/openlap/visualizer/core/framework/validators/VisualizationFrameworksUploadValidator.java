@@ -27,10 +27,9 @@ public class VisualizationFrameworksUploadValidator {
         if (frameworksConfig.stream().filter(new Predicate<VisualizationFramework>() {
             @Override
             public boolean test(VisualizationFramework visualizationFramework) {
-                if (visualizationFramework.getName() != null && visualizationFramework.getFrameworkLocation() != null &&
-                        visualizationFramework.getDescription() != null && visualizationFramework.getCreator() != null &&
-                        !visualizationFramework.getName().isEmpty() && !visualizationFramework.getCreator().isEmpty() &&
-                        !visualizationFramework.getDescription().isEmpty() && !visualizationFramework.getFrameworkLocation().isEmpty()
+                if (visualizationFramework.getName() != null && visualizationFramework.getDescription() != null
+                        && visualizationFramework.getCreator() != null && !visualizationFramework.getName().isEmpty()
+                        && !visualizationFramework.getCreator().isEmpty() && !visualizationFramework.getDescription().isEmpty()
                         && visualizationFramework.getVisualizationMethods() != null) {
                     //lets go deeper into the visualization methods definition
                     if (visualizationFramework.getVisualizationMethods().size() > 0) {
@@ -59,21 +58,21 @@ public class VisualizationFrameworksUploadValidator {
         try {
             DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(frameworksJar.getInputStream());
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(frameworksJar.getInputStream());
-            for(VisualizationFramework visualizationFramework : frameworksConfig){
-                for(VisualizationMethod visualizationMethod : visualizationFramework.getVisualizationMethods()){
+            for (VisualizationFramework visualizationFramework : frameworksConfig) {
+                for (VisualizationMethod visualizationMethod : visualizationFramework.getVisualizationMethods()) {
                     //lets first check the code generator
                     try {
-                        if(visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass())==null)
+                        if (visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass()) == null)
                             return false;
                         //now the data transformer
-                        if(dataTransformerFactory.createDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClass())==null)
+                        if (dataTransformerFactory.createDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClass()) == null)
                             return false;
-                    }catch (DataTransformerCreationException | VisualizationCodeGeneratorCreationException exception){
+                    } catch (DataTransformerCreationException | VisualizationCodeGeneratorCreationException exception) {
                         throw new VisualizationFrameworksUploadException(exception.getMessage());
                     }
                 }
             }
-        }catch (IOException exception){
+        } catch (IOException exception) {
             throw new VisualizationFrameworksUploadException(exception.getMessage());
         }
         return true;

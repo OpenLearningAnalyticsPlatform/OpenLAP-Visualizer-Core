@@ -14,21 +14,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "Google Charts",
-      "creator": "Bassim Bashir",
-      "description": "A framework providing great visualizations",
-      "visualizationMethods": [
-        {
-          "name": "Pie Chart",
-          "implementingClass": "de.rwthaachen.openlap.GooglePieChartVisualizationCodeGenerator",
-          "dataTransformerMethod": {
-            "name": "Pie Chart DataTransformer",
-            "implementingClass": "de.rwthaachen.openlap.PieChartDataTransformer"
-          }
-        }
-      ]
     }
   ]
 }

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,15 +82,21 @@ public class VisualizationFrameworkService {
      * @throws VisualizationFrameworksUploadException If the validation of the provided configuration failed or copying the provided jar file was not successful
      */
     public void uploadVisualizationFrameworks(List<VisualizationFramework> frameworkList, MultipartFile jarFile) throws VisualizationFrameworksUploadException {
-        // set the file location in all the framework objects
-        frameworkList.forEach(framework -> framework.setFrameworkLocation(Paths.get(fileManager.getFileStoragePath(jarFile.getName()).toString()+configurationService.getJarBundleExtension()).toString()));
         //validate the jar classes first before passing it on to the File Manager
         VisualizationFrameworksUploadValidator visualizationFrameworksUploadValidator = new VisualizationFrameworksUploadValidator();
         if (visualizationFrameworksUploadValidator.validateVisualizationFrameworksUploadConfiguration(frameworkList, jarFile)) {
             //if the configuration is valid then perform the upload, i.e db entries and copying of the jar
             // first copy the file over
             try {
-                fileManager.saveJarFile(jarFile.getName(), jarFile);
+                Path fileName = Paths.get(jarFile.getOriginalFilename()).getFileName();
+                String savedFilePath;
+                if(fileName != null){
+                    savedFilePath = fileManager.saveJarFile(fileName.toString(), jarFile);
+                }else{
+                    savedFilePath = fileManager.saveJarFile("", jarFile);
+                }
+                // set the file location in all the framework objects
+                frameworkList.forEach(framework -> framework.setFrameworkLocation(savedFilePath));
                 // set the framework in each of the methods as it is a bidirectional relationship
                 frameworkList.forEach(framework -> framework.getVisualizationMethods().forEach(method -> method.setVisualizationFramework(framework)));
                 visualizationFrameworkRepository.save(frameworkList);

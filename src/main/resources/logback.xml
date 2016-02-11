@@ -27,7 +27,7 @@
     </appender>
 
     <root level="DEBUG">
-        <appender-ref ref="consoleAppender" />
+       <appender-ref ref="consoleAppender" />
         <appender-ref ref="fileAppender"/>
     </root>
 </configuration>

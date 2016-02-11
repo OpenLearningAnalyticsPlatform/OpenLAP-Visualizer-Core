@@ -41,9 +41,7 @@ public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeG
     private void initializeClassLoader() {
         jarClassLoader.getThreadLoader().setOrder(1);
         jarClassLoader.getCurrentLoader().setOrder(2);
-        /*jarClassLoader.getSystemLoader().setOrder(3);
-        jarClassLoader.getParentLoader().setOrder(3);
-        jarClassLoader.getLocalLoader().setOrder(3);*/
+
         jarClassLoader.getParentLoader().setEnabled(false);
         jarClassLoader.getSystemLoader().setEnabled(false);
         jarClassLoader.getLocalLoader().setEnabled(false);

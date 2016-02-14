@@ -1,6 +1,7 @@
 package de.rwthaachen.openlap.visualizer.core.service;
 
 import de.rwthaachen.openlap.visualizer.core.exceptions.FileManagerException;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,22 +46,24 @@ public class FileManager {
 
         try {
             //create the the file storage directory if it does not exist
-            File directory = new File(configurationService.getFileManagerStorageLocation());
-            if (!directory.exists())
-                directory.mkdir();
-            //first copy to a temp directory and then use the ATOMIC_MOVE to avoid any thread issues
-            Path fileTemporaryStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation(), configurationService.getFileManagerTempStorageLocation());
-            if(!fileTemporaryStorageLocation.toFile().exists())
-                fileTemporaryStorageLocation.toFile().mkdir();
+            Path fileStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation());
+           /* if (!fileStorageLocation.toFile().exists())
+                fileStorageLocation.toFile().mkdirs();*/
 
-            fileToSave.transferTo(Paths.get(fileTemporaryStorageLocation.toString(),fileName).toFile());
+            //first copy to a temp directory and then use the ATOMIC_MOVE to avoid any thread issues
+            //Path fileTemporaryStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation(), configurationService.getFileManagerTempStorageLocation());
+            /*if(!fileTemporaryStorageLocation.toFile().exists())
+                fileTemporaryStorageLocation.toFile().mkdirs();*/
+
+            //Files.copy(fileToSave.getInputStream(),Paths.get(fileTemporaryStorageLocation.toString()),StandardCopyOption.REPLACE_EXISTING);
+            FileUtils.copyInputStreamToFile(fileToSave.getInputStream(),Paths.get(fileStorageLocation.toString(),fileName).toFile());
             Path fileFinalPath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName);
-            try {
-                Files.move(fileTemporaryStorageLocation.resolve(fileName), fileFinalPath , StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            /*try {
+                Files.move(Paths.get(fileTemporaryStorageLocation.toString()), Paths.get(fileStorageLocation.toString()) , StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException atomicMoveNotSupported) {
                 //if the atomic move didn't work then try copying over the file
-                Files.copy(fileTemporaryStorageLocation.resolve(fileName), fileFinalPath, StandardCopyOption.REPLACE_EXISTING);
-            }
+                Files.copy(Paths.get(fileTemporaryStorageLocation.toString(),fileName), Paths.get(fileStorageLocation.toString()), StandardCopyOption.REPLACE_EXISTING);
+            }*/
             return fileFinalPath.toString();
         } catch (IOException | SecurityException exception) {
             throw new FileManagerException(exception.getMessage());

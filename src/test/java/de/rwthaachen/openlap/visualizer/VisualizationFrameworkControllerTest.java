@@ -77,6 +77,7 @@ public class VisualizationFrameworkControllerTest {
     }
 
     @Test
+    @Ignore
     public void uploadVisualizationFrameworks() {
         try {
             logTestHeader(UPLOAD_FRAMEWORKS_ENDPOINT);
@@ -117,6 +118,7 @@ public class VisualizationFrameworkControllerTest {
     }
 
     @Test
+    @Ignore
     public void getListOfVisualizationFrameworks() {
         try {
             logTestHeader(GET_FRAMEWORKS_LIST_ENDPOINT);

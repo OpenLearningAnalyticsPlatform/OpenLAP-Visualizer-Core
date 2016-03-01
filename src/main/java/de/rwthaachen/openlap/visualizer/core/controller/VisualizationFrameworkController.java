@@ -93,11 +93,20 @@ public class VisualizationFrameworkController {
     public ValidateVisualizationMethodConfigurationResponse validateMethodConfiguration(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod, @RequestBody ValidateVisualizationMethodConfigurationRequest validateVisualizationMethodConfigurationRequest) {
         ValidateVisualizationMethodConfigurationResponse response = new ValidateVisualizationMethodConfigurationResponse();
         try {
+
+
             response.setConfigurationValid(visualizationFrameworkService.validateVisualizationMethodConfiguration(idOfMethod, validateVisualizationMethodConfigurationRequest.getConfigurationMapping()));
         } catch (DataSetValidationException exception) {
             response.setConfigurationValid(false);
             response.setValidationMessage(exception.getMessage());
         }
+        return response;
+    }
+
+    @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}/configuration", method = RequestMethod.GET)
+    public VisualizationMethodConfigurationResponse getMethodConfiguration(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod) {
+        VisualizationMethodConfigurationResponse response = new VisualizationMethodConfigurationResponse();
+        response.setMethodConfiguration(visualizationFrameworkService.getMethodConfiguration(idOfMethod));
         return response;
     }
 

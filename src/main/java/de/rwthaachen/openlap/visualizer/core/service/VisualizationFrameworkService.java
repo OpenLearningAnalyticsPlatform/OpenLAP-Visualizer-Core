@@ -4,6 +4,7 @@ import DataSet.OLAPPortConfiguration;
 import de.rwthaachen.openlap.visualizer.core.dao.DataTransformerMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationFrameworkRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
+import de.rwthaachen.openlap.visualizer.core.dtos.VisualizationMethodConfiguration;
 import de.rwthaachen.openlap.visualizer.core.exceptions.*;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactory;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactoryImpl;
@@ -232,5 +233,26 @@ public class VisualizationFrameworkService {
         } else {
             throw new DataSetValidationException("The visualization method represented by the id: " + visualizationMethodId + " not found.");
         }
+    }
+
+    /**
+     * Gets the configuration of a VisualizationMethod
+     *
+     * @param visualizationMethodId The id of the VisualizationMethod for which to get the configuration
+     * @return The VisualizationMethodConfiguration instance
+     * @throws VisualizationMethodNotFoundException if the VisualizationMethod was not found
+     */
+    public VisualizationMethodConfiguration getMethodConfiguration(long visualizationMethodId) throws VisualizationMethodNotFoundException {
+        if (!visualizationMethodRepository.exists(visualizationMethodId))
+            throw new VisualizationMethodNotFoundException("The visualization method with the id : " + visualizationMethodId + " does not exist.");
+
+        VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(visualizationMethodId);
+        //ask the factories for the instance
+        VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
+        VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
+        VisualizationMethodConfiguration visualizationMethodConfiguration = new VisualizationMethodConfiguration();
+        visualizationMethodConfiguration.setInput(codeGenerator.getInput());
+        visualizationMethodConfiguration.setOutput(codeGenerator.getOutput());
+        return visualizationMethodConfiguration;
     }
 }

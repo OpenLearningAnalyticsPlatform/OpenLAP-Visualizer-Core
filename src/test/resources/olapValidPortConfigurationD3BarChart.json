@@ -1,0 +1,28 @@
+{
+  "mapping" : [
+    {
+      "outputPort" : {
+        "type" : "STRING",
+        "id" : "incomingColumn",
+        "required" : true
+      },
+      "inputPort" : {
+        "type" : "STRING",
+        "id" : "wiki_user",
+        "required" : true
+      }
+    },
+    {
+      "outputPort" : {
+        "type" : "INTEGER",
+        "id" : "incomingColumn1",
+        "required" : true
+      },
+      "inputPort" : {
+        "type" : "INTEGER",
+        "id" : "num_of_posts",
+        "required" : true
+      }
+    }
+  ]
+}

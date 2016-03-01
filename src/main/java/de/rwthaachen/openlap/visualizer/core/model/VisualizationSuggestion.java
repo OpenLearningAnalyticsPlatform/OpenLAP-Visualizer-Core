@@ -1,10 +1,14 @@
 package de.rwthaachen.openlap.visualizer.core.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
+/**
+ * Model class representing the metadata of a Visualization Suggestion
+ *
+ * @author Bassim Bashir
+ */
 @Entity
 @Table(name = "VIS_SUGGESTIONS")
 @JsonIgnoreProperties(ignoreUnknown = true)

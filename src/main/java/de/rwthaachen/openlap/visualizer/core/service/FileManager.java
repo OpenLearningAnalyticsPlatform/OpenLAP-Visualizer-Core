@@ -8,7 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +31,8 @@ public class FileManager {
      *
      * @param fileName   The custom name of the file. If the name is null or empty then the name of the provided file will be used
      * @param fileToSave The file to save
-     * @throws FileManagerException If the saving of the file was not successful
      * @return The absolute location where the file is stored
+     * @throws FileManagerException If the saving of the file was not successful
      */
     public String saveJarFile(String fileName, MultipartFile fileToSave) throws FileManagerException {
         if (configurationService.getFileManagerStorageLocation() == null || fileToSave == null || configurationService.getFileManagerStorageLocation().isEmpty())
@@ -38,32 +40,19 @@ public class FileManager {
         if (fileToSave.isEmpty())
             throw new FileManagerException("The file has no contents");
         // if the filename is not provided
-        if (fileName == null || fileName.isEmpty()){
+        if (fileName == null || fileName.isEmpty()) {
             // then generate one with the timestamp
-            fileName = "jar_"+fileToSave.getName()+"_"+System.currentTimeMillis();
+            fileName = "jar_" + fileToSave.getName() + "_" + System.currentTimeMillis();
         }
-        fileName+=configurationService.getJarBundleExtension(); //add the JAR extension
+        fileName += configurationService.getJarBundleExtension(); //add the JAR extension
 
         try {
             //create the the file storage directory if it does not exist
             Path fileStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation());
-           /* if (!fileStorageLocation.toFile().exists())
-                fileStorageLocation.toFile().mkdirs();*/
 
-            //first copy to a temp directory and then use the ATOMIC_MOVE to avoid any thread issues
-            //Path fileTemporaryStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation(), configurationService.getFileManagerTempStorageLocation());
-            /*if(!fileTemporaryStorageLocation.toFile().exists())
-                fileTemporaryStorageLocation.toFile().mkdirs();*/
-
-            //Files.copy(fileToSave.getInputStream(),Paths.get(fileTemporaryStorageLocation.toString()),StandardCopyOption.REPLACE_EXISTING);
-            FileUtils.copyInputStreamToFile(fileToSave.getInputStream(),Paths.get(fileStorageLocation.toString(),fileName).toFile());
+            FileUtils.copyInputStreamToFile(fileToSave.getInputStream(), Paths.get(fileStorageLocation.toString(), fileName).toFile());
             Path fileFinalPath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName);
-            /*try {
-                Files.move(Paths.get(fileTemporaryStorageLocation.toString()), Paths.get(fileStorageLocation.toString()) , StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException atomicMoveNotSupported) {
-                //if the atomic move didn't work then try copying over the file
-                Files.copy(Paths.get(fileTemporaryStorageLocation.toString(),fileName), Paths.get(fileStorageLocation.toString()), StandardCopyOption.REPLACE_EXISTING);
-            }*/
+
             return fileFinalPath.toString();
         } catch (IOException | SecurityException exception) {
             throw new FileManagerException(exception.getMessage());

@@ -5,6 +5,7 @@ import de.rwthaachen.openlap.visualizer.core.dtos.request.GenerateVisualizationC
 import de.rwthaachen.openlap.visualizer.core.dtos.response.GenerateVisualizationCodeResponse;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationCodeGenerationException;
 import de.rwthaachen.openlap.visualizer.core.service.VisualizationEngineService;
+import de.rwthaachen.openlap.visualizer.framework.exceptions.UnTransformableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * A Spring controller which exposes the API of the Visualizer component
+ * A Spring controller which exposes the API of the VisualizationEngine. The endpoints provide functionality to generate
+ * client visualization code
+ *
+ * @author Bassim Bashir
  */
 @RestController
 public class VisualizationEngineController {
@@ -36,10 +40,19 @@ public class VisualizationEngineController {
     }
 
     @ExceptionHandler(VisualizationCodeGenerationException.class)
-    public ResponseEntity<Object> handleVisCodeGenerationException(VisualizationCodeGenerationException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleVisualizationCodeGenerationException(VisualizationCodeGenerationException exception, HttpServletRequest request) {
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(error, headers, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UnTransformableData.class)
+    public ResponseEntity<Object> handleDataTransformationException(UnTransformableData exception, HttpServletRequest request) {
         BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }

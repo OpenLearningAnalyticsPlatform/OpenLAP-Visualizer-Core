@@ -15,8 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by bas on 1/12/16.
- */
+ * A concrete implementation of the VisualizationCodeGeneratorFactory interface, providing a method for the creation of the
+ * VisualizationCodeGenerators. Uses the JCL (https://github.com/kamranzafar/JCL) library
+ *
+ * @author Bassim Bashir
+*/
 public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeGeneratorFactory {
 
     private JclObjectFactory jclObjectFactory;

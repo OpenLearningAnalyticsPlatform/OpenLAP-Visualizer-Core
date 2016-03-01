@@ -1,18 +1,13 @@
 package de.rwthaachen.openlap.visualizer.core.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import de.rwthaachen.openlap.visualizer.core.dtos.error.BaseErrorDTO;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationFrameworkRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationMethodRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UploadVisualizationFrameworksRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.ValidateVisualizationMethodConfigurationRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.*;
-import de.rwthaachen.openlap.visualizer.core.exceptions.DataSetValidationException;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworkDeletionException;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworksUploadException;
-import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
-import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
+import de.rwthaachen.openlap.visualizer.core.exceptions.*;
 import de.rwthaachen.openlap.visualizer.core.service.VisualizationFrameworkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -24,8 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.List;
 
+/**
+ * A Spring controller which exposes an API for the client to upload new VisualizationFrameworks as well as
+ * perform CRUD operations on VisualizationMethod and their VisualizationFrameworks
+ *
+ * @author Bassim Bashir
+ */
 @RestController
 @RequestMapping("/frameworks")
 public class VisualizationFrameworkController {
@@ -65,20 +65,17 @@ public class VisualizationFrameworkController {
             UploadVisualizationFrameworkResponse response = new UploadVisualizationFrameworkResponse();
             response.setSuccess(true);
             return response;
-        }catch (IOException ioexception){
-            throw new VisualizationFrameworksUploadException("Frameworks config not properly formed : "+ioexception.getMessage());
+        } catch (VisualizationFrameworkUploadException exception){
+            throw  new VisualizationFrameworkUploadException(exception.getMessage());
+        }catch (IOException exception){
+            throw new RuntimeException (exception.getMessage());
         }
-
     }
 
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.GET)
     public VisualizationMethodDetailsResponse getFrameworkMethodDetails(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod) {
         VisualizationMethodDetailsResponse response = new VisualizationMethodDetailsResponse();
-        VisualizationMethod visualizationMethod = visualizationFrameworkService.findVisualizationMethodById(idOfMethod);
-        if (visualizationMethod != null)
-            response.setVisualizationMethod(visualizationMethod);
-        else
-            response.setVisualizationMethod(new VisualizationMethod("", "",null,null));
+        response.setVisualizationMethod(visualizationFrameworkService.findVisualizationMethodById(idOfMethod));
         return response;
     }
 
@@ -111,8 +108,8 @@ public class VisualizationFrameworkController {
         return visualizationFrameworksDetailsResponse;
     }
 
-    @ExceptionHandler(VisualizationFrameworksUploadException.class)
-    public ResponseEntity<Object> handleVisFrameworkUploadException(VisualizationFrameworksUploadException exception, HttpServletRequest request) {
+    @ExceptionHandler(VisualizationFrameworkUploadException.class)
+    public ResponseEntity<Object> handleVisualizationFrameworkUploadException(VisualizationFrameworkUploadException exception, HttpServletRequest request) {
         BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -120,12 +117,27 @@ public class VisualizationFrameworkController {
     }
 
     @ExceptionHandler(VisualizationFrameworkDeletionException.class)
-    public ResponseEntity<Object> handleVisFrameworkUploadException(VisualizationFrameworkDeletionException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleVisualizationFrameworkDeletionException(VisualizationFrameworkDeletionException exception, HttpServletRequest request) {
         BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(VisualizationFrameworkNotFoundException.class)
+    public ResponseEntity<Object> handleVisualizationFrameworkNotFoundException(VisualizationFrameworkNotFoundException exception, HttpServletRequest request) {
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(error, headers, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(VisualizationMethodNotFoundException.class)
+    public ResponseEntity<Object> handleVisualizationMethodNotFoundException(VisualizationMethodNotFoundException exception, HttpServletRequest request) {
+        BaseErrorDTO error = BaseErrorDTO.createBaseErrorDTO(exception.getMessage(), "", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(error, headers, HttpStatus.NOT_FOUND);
+    }
 
 }

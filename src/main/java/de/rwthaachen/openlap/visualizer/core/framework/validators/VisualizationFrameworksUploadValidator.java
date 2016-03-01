@@ -2,7 +2,7 @@ package de.rwthaachen.openlap.visualizer.core.framework.validators;
 
 import de.rwthaachen.openlap.visualizer.core.exceptions.DataTransformerCreationException;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationCodeGeneratorCreationException;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworksUploadException;
+import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworkUploadException;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.DataTransformerFactory;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.DataTransformerFactoryImpl;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactory;
@@ -17,12 +17,14 @@ import java.util.function.Predicate;
 
 /**
  * Class contains the logic and functions to validate the config object of visualization frameworks
+ *
+ * @author Bassim Bashir
  */
 //TODO: convert the framework config to json and encapsulate it in the exception to send back to the client upon failure of validation
 public class VisualizationFrameworksUploadValidator {
 
     //TODO: return information about why the validation failed!!!
-    public boolean validateVisualizationFrameworksUploadConfiguration(List<VisualizationFramework> frameworksConfig, MultipartFile frameworksJar) throws VisualizationFrameworksUploadException {
+    public boolean validateVisualizationFrameworksUploadConfiguration(List<VisualizationFramework> frameworksConfig, MultipartFile frameworksJar) throws VisualizationFrameworkUploadException {
         // first step of validation, check if all the fields are not null
         if (frameworksConfig.stream().filter(new Predicate<VisualizationFramework>() {
             @Override
@@ -68,12 +70,12 @@ public class VisualizationFrameworksUploadValidator {
                         if (dataTransformerFactory.createDataTransformer(visualizationMethod.getDataTransformerMethod().getImplementingClass()) == null)
                             return false;
                     } catch (DataTransformerCreationException | VisualizationCodeGeneratorCreationException exception) {
-                        throw new VisualizationFrameworksUploadException(exception.getMessage());
+                        throw new VisualizationFrameworkUploadException(exception.getMessage());
                     }
                 }
             }
         } catch (IOException exception) {
-            throw new VisualizationFrameworksUploadException(exception.getMessage());
+            throw new VisualizationFrameworkUploadException(exception.getMessage());
         }
         return true;
     }

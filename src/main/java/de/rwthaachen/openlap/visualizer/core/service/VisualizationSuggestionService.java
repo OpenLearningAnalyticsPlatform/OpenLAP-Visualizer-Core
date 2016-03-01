@@ -8,7 +8,9 @@ import de.rwthaachen.openlap.visualizer.OpenLAPVisualizerApplication;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationSuggestionRepository;
 import de.rwthaachen.openlap.visualizer.core.dtos.VisualizationSuggestionDetails;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationSuggestionException;
+import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworkDeletionException;
+import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationSuggestionCreationException;
+import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationSuggestionNotFoundException;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationSuggestion;
 import org.slf4j.Logger;
@@ -21,9 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by bas on 1/9/16.
+ * A service which provides functions to perform CRUD operations on the VisualizationSuggestions
+ *
+ * @author Bassim Bashir
  */
-
 @Service
 public class VisualizationSuggestionService {
 
@@ -34,6 +37,13 @@ public class VisualizationSuggestionService {
     private VisualizationMethodRepository visualizationMethodRepository;
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Finds and returns a list of VisualizationSuggestions matching the provided OLAPPortConfiguration
+     *
+     * @param olapPortConfiguration The OLAPPortConfiguration for which to search VisualizationSuggestion for
+     * @return list of VisualizationSuggestions matching the OLAPPortConfiguration
+     * @throws VisualizationFrameworkDeletionException if the deletion of the VisualizationFramework encountered problems such as the file couldn't be removed
+     */
     public List<VisualizationSuggestionDetails> getSuggestionsForDataSetConfiguration(OLAPPortConfiguration olapPortConfiguration) {
         Iterable<VisualizationSuggestion> suggestionList = visualizationSuggestionRepository.findAll();
         List<VisualizationSuggestionDetails> matchedSuggestions = new ArrayList<>();
@@ -45,6 +55,7 @@ public class VisualizationSuggestionService {
                 if (dataSet.validateConfiguration(olapPortConfiguration).isValid()) {
                     VisualizationMethod visualizationMethod = suggestion.getVisualizationMethod();
                     VisualizationSuggestionDetails suggestionDetails = new VisualizationSuggestionDetails();
+                    suggestionDetails.setSuggestionId(suggestion.getId());
                     suggestionDetails.setMethodId(visualizationMethod.getId());
                     suggestionDetails.setMethodName(visualizationMethod.getName());
                     suggestionDetails.setFrameworkId(visualizationMethod.getVisualizationFramework().getId());
@@ -59,10 +70,17 @@ public class VisualizationSuggestionService {
         return matchedSuggestions;
     }
 
-    public VisualizationSuggestionDetails getSuggestionDetails(long suggestionId) throws VisualizationSuggestionException {
+    /**
+     * Finds and returns a VisualizationSuggestion matching the provided id
+     *
+     * @param suggestionId The id of the VisualizationSuggestion to search for
+     * @return VisualizationSuggestion found in the database
+     * @throws VisualizationSuggestionNotFoundException if the VisualizationSuggestion does not exist
+     */
+    public VisualizationSuggestionDetails getSuggestionDetails(long suggestionId) throws VisualizationSuggestionNotFoundException {
         VisualizationSuggestion suggestion = visualizationSuggestionRepository.findOne(suggestionId);
         if (suggestion == null)
-            throw new VisualizationSuggestionException("Visualization suggestion with id: " + suggestionId + " not found.");
+            throw new VisualizationSuggestionNotFoundException("Visualization suggestion with id: " + suggestionId + " not found.");
         else {
             VisualizationSuggestionDetails visualizationSuggestionDetails = new VisualizationSuggestionDetails();
             visualizationSuggestionDetails.setMethodId(suggestion.getVisualizationMethod().getId());
@@ -73,58 +91,77 @@ public class VisualizationSuggestionService {
         }
     }
 
-    public boolean deleteVisualizationSuggestions(long suggestionId) throws VisualizationSuggestionException {
-        if (visualizationSuggestionRepository.exists(suggestionId)){
+    /**
+     * Deletes a VisualizationSuggestion matching the provided id
+     *
+     * @param suggestionId The id of the VisualizationSuggestion to delete
+     * @return true if the VisualizationSuggestion was successfully deleted, otherwise false
+     * @throws VisualizationSuggestionNotFoundException if the VisualizationSuggestion does not exist
+     */
+    public boolean deleteVisualizationSuggestions(long suggestionId) throws VisualizationSuggestionNotFoundException {
+        if (visualizationSuggestionRepository.exists(suggestionId)) {
             visualizationSuggestionRepository.delete(suggestionId);
-            if(visualizationSuggestionRepository.exists(suggestionId))
+            if (visualizationSuggestionRepository.exists(suggestionId))
                 return false;
             else
                 return true;
-        }
-        else
-            throw new VisualizationSuggestionException("Visualization suggestion with id: " + suggestionId + " not found.");
+        } else
+            throw new VisualizationSuggestionNotFoundException("Visualization suggestion with id: " + suggestionId + " not found.");
     }
 
-    public VisualizationSuggestion updateVisualizationSuggestionAttributes(long suggestionId, VisualizationSuggestion newAttributes) throws VisualizationSuggestionException{
-        if(visualizationSuggestionRepository.exists(suggestionId)){
+    /**
+     * Updates a VisualizationSuggestion matching the provided id
+     *
+     * @param suggestionId  The id of the VisualizationSuggestion to delete
+     * @param newAttributes The instance of VisualizationSuggestion containing the new values
+     * @return updated VisualizationSuggestion instance
+     * @throws VisualizationSuggestionNotFoundException if the VisualizationSuggestion does not exist
+     */
+    public VisualizationSuggestion updateVisualizationSuggestionAttributes(long suggestionId, VisualizationSuggestion newAttributes) throws VisualizationSuggestionNotFoundException {
+        if (visualizationSuggestionRepository.exists(suggestionId)) {
             VisualizationSuggestion suggestionToUpdate = visualizationSuggestionRepository.findOne(suggestionId);
-            if(newAttributes.getVisualizationMethod()!=null) {
+            if (newAttributes.getVisualizationMethod() != null) {
                 // only the id is needed for an update
-                if(visualizationMethodRepository.exists(newAttributes.getVisualizationMethod().getId())) {
+                if (visualizationMethodRepository.exists(newAttributes.getVisualizationMethod().getId())) {
                     // if the method exists, then lets update it
                     VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(newAttributes.getVisualizationMethod().getId());
                     suggestionToUpdate.setVisualizationMethod(visualizationMethod);
                 }
             }
-            if(newAttributes.getOlapDataSetConfiguration()!=null && !newAttributes.getOlapDataSetConfiguration().isEmpty())
+            if (newAttributes.getOlapDataSetConfiguration() != null && !newAttributes.getOlapDataSetConfiguration().isEmpty())
                 suggestionToUpdate.setOlapDataSetConfiguration(newAttributes.getOlapDataSetConfiguration());
 
-           return visualizationSuggestionRepository.save(suggestionToUpdate);
-        }
-        else{
-            throw new VisualizationSuggestionException("The suggestion with the id: "+suggestionId+" does not exist. Update failed.");
+            return visualizationSuggestionRepository.save(suggestionToUpdate);
+        } else {
+            throw new VisualizationSuggestionNotFoundException("The suggestion with the id: " + suggestionId + " does not exist. Update failed.");
         }
     }
 
-    public VisualizationSuggestion createVisualizationSuggestion(long visualizationMethodId, OLAPDataSet dataSet) throws VisualizationSuggestionException{
-        if(visualizationMethodRepository.exists(visualizationMethodId)){
-            if(dataSet != null){
-                VisualizationSuggestion newVisualizationSuggestion =  new VisualizationSuggestion();
+    /**
+     * Creates a new VisualizationSuggestion
+     *
+     * @param visualizationMethodId The id of the VisualizationMethod to which to attach the new VisualizationSuggestion to
+     * @param dataSet               The OLAPDataSet containing the configuration for which this new VisualizationSuggestion applies
+     * @return the newly created instance of the VisualizationSuggestion
+     * @throws VisualizationSuggestionCreationException if the creation of the VisualizationSuggestion failed
+     */
+    public VisualizationSuggestion createVisualizationSuggestion(long visualizationMethodId, OLAPDataSet dataSet) throws VisualizationSuggestionCreationException {
+        if (visualizationMethodRepository.exists(visualizationMethodId)) {
+            if (dataSet != null) {
+                VisualizationSuggestion newVisualizationSuggestion = new VisualizationSuggestion();
                 VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(visualizationMethodId);
                 newVisualizationSuggestion.setVisualizationMethod(visualizationMethod);
                 try {
                     newVisualizationSuggestion.setOlapDataSetConfiguration(objectMapper.writeValueAsString(dataSet));
                     return visualizationSuggestionRepository.save(newVisualizationSuggestion);
-                }catch(JsonProcessingException exception){
-                    throw new VisualizationSuggestionException("Creation of a new visualization suggestion failed, could not serialize the provided OLAPDataset.");
+                } catch (JsonProcessingException exception) {
+                    throw new VisualizationSuggestionCreationException("Creation of a new visualization suggestion failed, could not serialize the provided OLAPDataset.");
                 }
+            } else {
+                throw new VisualizationSuggestionCreationException("For a new suggestion an OLAPDataset with column configuration needs to be provided. The data itself can be ignored.");
             }
-            else{
-                throw new VisualizationSuggestionException("For a new suggestion an OLAPDataset with column configuration needs to be provided. The data itself is not required!");
-            }
-        }
-        else{
-            throw new VisualizationSuggestionException("Cannot create a visualization suggestion as the provided vis method Id: "+visualizationMethodId+", does not exist.");
+        } else {
+            throw new VisualizationSuggestionCreationException("Cannot create a visualization suggestion as the provided vis method Id: " + visualizationMethodId + ", does not exist.");
         }
     }
 }

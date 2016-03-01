@@ -28,16 +28,13 @@ public class VisualizationEngineService {
     @Autowired
     VisualizationFrameworkRepository visualizationFrameworkRepository;
 
-    @Autowired
-    ConfigurationService configurationService;
-
     /**
      * Generates the visualization code
      *
      * @param dataSet       The data set containing the data to visualize
-     * @param frameworkName The name of the framework to use
-     * @param methodName    The name of the visualization technique to use
-     * @return The visualization code
+     * @param frameworkName The name of the VisualizationFramework to use
+     * @param methodName    The name of the VisualizationMethod to use
+     * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
     public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet) throws VisualizationCodeGenerationException {
@@ -66,9 +63,9 @@ public class VisualizationEngineService {
      * Generates the visualization code
      *
      * @param olapDataSet The data set containing the data to visualize
-     * @param frameworkId The id of the framework to use
-     * @param methodId    The id of the visualization technique to use
-     * @return The visualization code
+     * @param frameworkId The id of the VisualizationFramework to use
+     * @param methodId    The id of the VisualizationMethod to use
+     * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
     public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet) throws VisualizationCodeGenerationException {

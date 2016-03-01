@@ -1,14 +1,14 @@
 package de.rwthaachen.openlap.visualizer;
 
+import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationFrameworkRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UploadVisualizationFrameworksRequest;
-import de.rwthaachen.openlap.visualizer.core.dtos.response.DeleteVisualizationFrameworkResponse;
-import de.rwthaachen.openlap.visualizer.core.dtos.response.UpdateVisualizationFrameworkResponse;
-import de.rwthaachen.openlap.visualizer.core.dtos.response.UploadVisualizationFrameworkResponse;
-import de.rwthaachen.openlap.visualizer.core.dtos.response.VisualizationFrameworksDetailsResponse;
+import de.rwthaachen.openlap.visualizer.core.dtos.request.ValidateVisualizationMethodConfigurationRequest;
+import de.rwthaachen.openlap.visualizer.core.dtos.response.*;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,8 +35,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Random;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,16 +52,18 @@ public class VisualizationFrameworkControllerTest {
             LoggerFactory.getLogger(OpenLAPVisualizerApplication.class);
 
     public static String GET_FRAMEWORKS_LIST_ENDPOINT = "/frameworks/list";
+    private static String GET_FRAMEWORK_ENDPOINT = "/frameworks/?";
     private static String UPDATE_FRAMEWORK_DETAILS_ENDPOINT = "/frameworks/?/update";
     private static String DELETE_FRAMEWORK_ENDPOINT = "/frameworks/?";
     private static String UPLOAD_FRAMEWORKS_ENDPOINT = "/frameworks/upload";
+    private static String VALIDATE_CONFIGURATION_ENDPOINT="/frameworks/{idOfFramework}/methods/{idOfMethod}/validateConfiguration";
     private static String D3_VISUALIZATIONS_JAR = "openlap-visualizer-framework-sample-d3-1.0.jar";
     private static String FRAMEWORKS_JAR_INVALID = "visualizationFrameworksInvalid.jar";
     private static String VISUALIZATION_FRAMEWORKS_VALID_UPLOAD_CONFIG = "visualizationFrameworksUploadValidConfigD3.json";
     private static String VISUALIZATION_FRAMEWORKS_INVALID_UPLOAD_CONFIG = "visualizationFrameworksUploadInvalidConfig.json";
-
     private static String GOOGLE_CHARTS_VALID_UPLOAD_CONFIG = "visualizationFrameworksUploadValidConfigGooglePieChart.json";
     private static String GOOGLE_CHARTS_VISUALIZATIONS_JAR = "openlap-visualizer-framework-sample-google-chart-1.0.jar";
+    private static String VALID_PORT_CONFIG_D3_BAR_CHART = "olapValidPortConfigurationD3BarChart.json";
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
@@ -122,13 +126,9 @@ public class VisualizationFrameworkControllerTest {
     public void getListOfVisualizationFrameworks() {
         try {
             logTestHeader(GET_FRAMEWORKS_LIST_ENDPOINT);
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(GET_FRAMEWORKS_LIST_ENDPOINT)
-                    .contentType(contentType))
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andReturn();
-            VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworksDetailsResponse.class);
-            log.info("Number of visualization frameworks existing in the system : " + visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size());
-            log.info("List of frameworks : " + objectWriter.writeValueAsString(visualizationFrameworksDetailsResponse));
+            List<VisualizationFramework> listOfFrameworks = listOfVisualizationFrameworks();
+            log.info("Number of visualization frameworks existing in the system : " + listOfFrameworks.size());
+            log.info("List of frameworks : " + objectWriter.writeValueAsString(listOfFrameworks));
             logTestFooter(GET_FRAMEWORKS_LIST_ENDPOINT);
         } catch (Exception exception) {
             log.error("Test url: " + GET_FRAMEWORKS_LIST_ENDPOINT + " failed.", exception);
@@ -142,26 +142,22 @@ public class VisualizationFrameworkControllerTest {
         try {
             logTestHeader(UPDATE_FRAMEWORK_DETAILS_ENDPOINT);
             //first lets ask for a list of frameworks
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(GET_FRAMEWORKS_LIST_ENDPOINT)
-                    .contentType(contentType))
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andReturn();
-            VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworksDetailsResponse.class);
-            if (visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size() == 0) {
-                log.error("No Visualization Frameworks exist, cannot update. Endpoint test : " + GET_FRAMEWORKS_LIST_ENDPOINT + " failed");
+            List<VisualizationFramework> frameworkList = listOfVisualizationFrameworks();
+            if (frameworkList.size() == 0) {
+                log.error("No Visualization Frameworks exist, cannot update. Endpoint test : " + UPDATE_FRAMEWORK_DETAILS_ENDPOINT + " failed");
                 fail("No Visualization Frameworks exist, cannot update.");
             }
             //choose one framework from the list at random at update it
-            int randomIndex = new Random().nextInt(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size());
-            String visFrameworkUpdateURL = GET_FRAMEWORKS_LIST_ENDPOINT.replace("?", Long.toString(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomIndex).getId()));
+            int randomIndex = new Random().nextInt(frameworkList.size());
+            String visFrameworkUpdateURL = UPDATE_FRAMEWORK_DETAILS_ENDPOINT.replace("?", Long.toString(frameworkList.get(randomIndex).getId()));
             log.info("Framework chosen at random, finalized visualization framework update URL: " + visFrameworkUpdateURL);
-            VisualizationFramework updatedVisualizationFramework = visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomIndex);
+            VisualizationFramework updatedVisualizationFramework = frameworkList.get(randomIndex);
             updatedVisualizationFramework.setCreator("Creator updated to: Unknown");
             updatedVisualizationFramework.setDescription("The description has been manipulated with");
             updatedVisualizationFramework.setName("The name of the vis framework has been tampered with");
             UpdateVisualizationFrameworkRequest updateVisualizationFrameworkRequest = new UpdateVisualizationFrameworkRequest();
             updateVisualizationFrameworkRequest.setVisualizationFramework(updatedVisualizationFramework);
-            mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(visFrameworkUpdateURL, updateVisualizationFrameworkRequest)
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(visFrameworkUpdateURL, updateVisualizationFrameworkRequest)
                     .contentType(contentType))
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andReturn();
@@ -179,20 +175,15 @@ public class VisualizationFrameworkControllerTest {
         try {
             logTestHeader(DELETE_FRAMEWORK_ENDPOINT);
             //first lets ask for a list of frameworks
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(GET_FRAMEWORKS_LIST_ENDPOINT)
-                    .contentType(contentType))
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andReturn();
-            VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworksDetailsResponse.class);
-            log.info("List of frameworks : " + objectWriter.writeValueAsString(visualizationFrameworksDetailsResponse));
-            if (visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size() == 0) {
-                log.error("No Visualization Frameworks exist, cannot update. Endpoint test : " + GET_FRAMEWORKS_LIST_ENDPOINT + " failed");
+            List<VisualizationFramework> frameworkList = listOfVisualizationFrameworks();
+            if (frameworkList.size() == 0) {
+                log.error("No Visualization Frameworks exist, cannot delete. Endpoint test : " + DELETE_FRAMEWORK_ENDPOINT + " failed");
                 fail("No Visualization Frameworks exist, cannot delete.");
             }
             //choose one framework from the list at random at update it
-            int randomIndex = new Random().nextInt(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().size());
-            String visFrameworkDeleteURL = DELETE_FRAMEWORK_ENDPOINT.replace("?", Long.toString(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomIndex).getId()));
-            mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(visFrameworkDeleteURL)
+            int randomIndex = new Random().nextInt(frameworkList.size());
+            String visFrameworkDeleteURL = DELETE_FRAMEWORK_ENDPOINT.replace("?", Long.toString(frameworkList.get(randomIndex).getId()));
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(visFrameworkDeleteURL)
                     .contentType(contentType))
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andReturn();
@@ -220,13 +211,44 @@ public class VisualizationFrameworkControllerTest {
     }
 
     @Test
-    public void getVisualizationFrameworkDetails() {
-
+    public void getVisualizationFrameworkDetails() throws Exception{
+        logTestHeader(GET_FRAMEWORK_ENDPOINT);
+        List<VisualizationFramework> visualizationFrameworkList = listOfVisualizationFrameworks();
+        if(visualizationFrameworkList.size() == 0) {
+            log.error("No Visualization Frameworks exist, cannot retrieve one. Endpoint test : " + GET_FRAMEWORK_ENDPOINT + " failed");
+            fail("No Visualization Frameworks exist, cannot retrieve one. Endpoint test : " + GET_FRAMEWORK_ENDPOINT + " failed");
+        }
+        int randomFrameworkId = new Random().nextInt(visualizationFrameworkList.size());
+        String getFrameworkURL = GET_FRAMEWORK_ENDPOINT.replace("?", Long.toString(visualizationFrameworkList.get(randomFrameworkId).getId()));
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(getFrameworkURL)
+                .contentType(contentType))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+        VisualizationFrameworkDetailsResponse visualizationFrameworkDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworkDetailsResponse.class);
+        assertNotNull(visualizationFrameworkDetailsResponse.getVisualizationFramework());
+        log.info("Visualization framework details URL: "+getFrameworkURL+". Framework details are: "+objectWriter.writeValueAsString(visualizationFrameworkDetailsResponse.getVisualizationFramework()));
+        logTestFooter(GET_FRAMEWORK_ENDPOINT);
     }
 
     @Test
-    public void validateMethodConfiguration() {
-
+    public void validateMethodConfiguration() throws Exception {
+        logTestHeader(VALIDATE_CONFIGURATION_ENDPOINT);
+        List<VisualizationFramework> frameworkList = listOfVisualizationFrameworks();
+        ValidateVisualizationMethodConfigurationRequest validateVisualizationMethodConfigurationRequest = new ValidateVisualizationMethodConfigurationRequest();
+        OLAPPortConfiguration olapPortConfiguration = objectMapper.readValue(new File(getClass().getClassLoader().getResource(VALID_PORT_CONFIG_D3_BAR_CHART).toURI()),OLAPPortConfiguration.class);
+        validateVisualizationMethodConfigurationRequest.setConfigurationMapping(olapPortConfiguration);
+        
+        logTestFooter(VALIDATE_CONFIGURATION_ENDPOINT);
     }
+
+    private List<VisualizationFramework> listOfVisualizationFrameworks() throws Exception{
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(GET_FRAMEWORKS_LIST_ENDPOINT)
+                .contentType(contentType))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+        VisualizationFrameworksDetailsResponse visualizationFrameworksDetailsResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VisualizationFrameworksDetailsResponse.class);
+        return visualizationFrameworksDetailsResponse.getVisualizationFrameworks();
+    }
+
 
 }

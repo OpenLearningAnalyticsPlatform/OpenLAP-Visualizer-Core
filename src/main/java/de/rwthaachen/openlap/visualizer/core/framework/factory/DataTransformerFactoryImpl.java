@@ -15,7 +15,7 @@ import java.io.InputStream;
 
 /**
  * A concrete implementation of the DataTransformerFactory interface, providing a method for the creation of the
- * DataTransformer adapters
+ * DataTransformer adapters. Uses the JCL (https://github.com/kamranzafar/JCL) library
  *
  * @author Bassim Bashir
  */

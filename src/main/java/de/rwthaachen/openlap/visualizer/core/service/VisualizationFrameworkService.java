@@ -4,10 +4,7 @@ import DataSet.OLAPPortConfiguration;
 import de.rwthaachen.openlap.visualizer.core.dao.DataTransformerMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationFrameworkRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
-import de.rwthaachen.openlap.visualizer.core.exceptions.DataSetValidationException;
-import de.rwthaachen.openlap.visualizer.core.exceptions.FileManagerException;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworkDeletionException;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworksUploadException;
+import de.rwthaachen.openlap.visualizer.core.exceptions.*;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactory;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactoryImpl;
 import de.rwthaachen.openlap.visualizer.core.framework.validators.VisualizationFrameworksUploadValidator;
@@ -24,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A service which provides functions to perform CRUD operations on the Visualization Frameworks or Visualization Methods. In addition, also methods to get information about the stored
@@ -46,11 +44,8 @@ public class VisualizationFrameworkService {
     @Autowired
     private FileManager fileManager;
 
-    @Autowired
-    private ConfigurationService configurationService;
-
     /**
-     * @return The list of visualization frameworks existing in the system
+     * @return The list of VisualizationFrameworks existing in the system
      */
     public List<VisualizationFramework> findAllVisualizationFrameworks() {
         List<VisualizationFramework> visualizationFrameworkList = new ArrayList<>();
@@ -59,18 +54,26 @@ public class VisualizationFrameworkService {
     }
 
     /**
-     * @param visualizationFrameworkId The id of the framework to retrieve
-     * @return The visualization framework represented by the provided id
+     * @param visualizationFrameworkId The id of the VisualizationFramework to retrieve
+     * @return The VisualizationFramework represented by the provided id
+     * @throws VisualizationFrameworkNotFoundException when the framework was not found
      */
-    public VisualizationFramework findVisualizationFrameworkById(long visualizationFrameworkId) {
+    public VisualizationFramework findVisualizationFrameworkById(long visualizationFrameworkId) throws VisualizationFrameworkNotFoundException {
+        if (!visualizationFrameworkRepository.exists(visualizationFrameworkId))
+            throw new VisualizationFrameworkNotFoundException("The framework with id: " + visualizationFrameworkId + " does not exist.");
+
         return visualizationFrameworkRepository.findOne(visualizationFrameworkId);
     }
 
     /**
-     * @param visualizationMethodId The id of the visualization method to retrieve
-     * @return The visualization method represented by the provided id
+     * @param visualizationMethodId The id of the VisualizationMethod to retrieve
+     * @return The VisualizationMethod represented by the provided id
+     * @throws VisualizationMethodNotFoundException when the method was not found
      */
-    public VisualizationMethod findVisualizationMethodById(long visualizationMethodId) {
+    public VisualizationMethod findVisualizationMethodById(long visualizationMethodId) throws VisualizationMethodNotFoundException {
+        if (!visualizationMethodRepository.exists(visualizationMethodId))
+            throw new VisualizationMethodNotFoundException("The method with id: " + visualizationMethodId + " does not exist.");
+
         return visualizationMethodRepository.findOne(visualizationMethodId);
     }
 
@@ -79,9 +82,9 @@ public class VisualizationFrameworkService {
      *
      * @param frameworkList The configuration of the frameworks in the provided jar file
      * @param jarFile       The jar bundle which contains the package framework implementation
-     * @throws VisualizationFrameworksUploadException If the validation of the provided configuration failed or copying the provided jar file was not successful
+     * @throws VisualizationFrameworkUploadException If the validation of the provided configuration failed or copying the provided jar file was not successful
      */
-    public void uploadVisualizationFrameworks(List<VisualizationFramework> frameworkList, MultipartFile jarFile) throws VisualizationFrameworksUploadException {
+    public void uploadVisualizationFrameworks(List<VisualizationFramework> frameworkList, MultipartFile jarFile) throws VisualizationFrameworkUploadException {
         //validate the jar classes first before passing it on to the File Manager
         VisualizationFrameworksUploadValidator visualizationFrameworksUploadValidator = new VisualizationFrameworksUploadValidator();
         if (visualizationFrameworksUploadValidator.validateVisualizationFrameworksUploadConfiguration(frameworkList, jarFile)) {
@@ -90,9 +93,9 @@ public class VisualizationFrameworkService {
             try {
                 Path fileName = Paths.get(jarFile.getOriginalFilename()).getFileName();
                 String savedFilePath;
-                if(fileName != null){
+                if (fileName != null) {
                     savedFilePath = fileManager.saveJarFile(fileName.toString(), jarFile);
-                }else{
+                } else {
                     savedFilePath = fileManager.saveJarFile("", jarFile);
                 }
                 // set the file location in all the framework objects
@@ -101,21 +104,21 @@ public class VisualizationFrameworkService {
                 frameworkList.forEach(framework -> framework.getVisualizationMethods().forEach(method -> method.setVisualizationFramework(framework)));
                 visualizationFrameworkRepository.save(frameworkList);
             } catch (FileManagerException fileManagerException) {
-                throw new VisualizationFrameworksUploadException(fileManagerException.getMessage());
+                throw new VisualizationFrameworkUploadException(fileManagerException.getMessage());
             }
         } else {
-            throw new VisualizationFrameworksUploadException("Upload configuration is not correct");
+            throw new VisualizationFrameworkUploadException("Upload configuration is not correct");
         }
     }
 
     /**
-     * Removes a previously added visualization framework from the system. This includes all the Database entries alongwith the
-     * stored JAR
+     * Removes a previously added VisualizationFramework from the system. This includes all the Database entries alongwith the
+     * stored JAR (if no other framework is referencing it)
      *
-     * @param frameworkId The id of the framework to delete. The function will first try
+     * @param frameworkId The id of the VisualizationFramework to delete. The function will first try
      *                    to parse the parameter into an id if that doesn't then to treat it as a framework name
-     * @return true if the deletion of the framework was successful
-     * @throws VisualizationFrameworkDeletionException if the deletion of the framework encountered problems such as the file couldn't be removed
+     * @return true if the deletion of the VisualizationFramework was successful
+     * @throws VisualizationFrameworkDeletionException if the deletion of the VisualizationFramework encountered problems such as the file couldn't be removed
      */
     @Transactional(rollbackFor = {RuntimeException.class})
     public boolean deleteVisualizationFramework(String frameworkId) throws VisualizationFrameworkDeletionException {
@@ -125,6 +128,7 @@ public class VisualizationFrameworkService {
             long idOfFramework = Long.parseLong(frameworkId);
             //first load the framework to get the jar location
             VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(idOfFramework);
+            String frameworkLocation = visualizationFramework.getFrameworkLocation();
             if (visualizationFramework == null)
                 throw new VisualizationFrameworkDeletionException("Could not delete the framework with id: " + frameworkId + ", not found");
             // remove all the database entries
@@ -133,13 +137,19 @@ public class VisualizationFrameworkService {
                 dataTransformerMethodRepository.delete(visualizationMethod.getDataTransformerMethod().getId());
             });
             visualizationFrameworkRepository.delete(idOfFramework);
-            //finally delete the jar
-            try {
-                fileManager.deleteFile(visualizationFramework.getFrameworkLocation());
-            } catch (FileManagerException fileManagerException) {
-                throw new VisualizationFrameworkDeletionException(fileManagerException.getMessage());
+            //finally delete the jar, if no other framework references it
+            List<VisualizationFramework> frameworksReferenced = findAllVisualizationFrameworks().stream()
+                    .filter((framework) -> framework.getFrameworkLocation().equals((frameworkLocation)))
+                    .collect(Collectors.toList());
+            if (frameworksReferenced.size() > 0) {
+                try {
+                    fileManager.deleteFile(visualizationFramework.getFrameworkLocation());
+                } catch (FileManagerException fileManagerException) {
+                    throw new VisualizationFrameworkDeletionException(fileManagerException.getMessage());
+                }
             }
-            if(visualizationFrameworkRepository.exists(idOfFramework))
+
+            if (visualizationFrameworkRepository.exists(idOfFramework))
                 return false;
             else
                 return true;
@@ -149,13 +159,18 @@ public class VisualizationFrameworkService {
     }
 
     /**
-     * Updates the attributes of visualization method
+     * Updates the attributes of a VisualizationMethod
      *
      * @param newAttributes An instance filled with the new values of the visualization method. Except for the visualization framework, the method id and the data transformer id
      *                      all other attributes can be updated
-     * @param idOfMethod    the id of the visualization method to be updated
+     * @param idOfMethod    the id of the VisualizationMethod to be updated
+     * @return VisualizationMethod the updated object of the VisualizationMethod
+     * @throws VisualizationMethodNotFoundException if the VisualizationMethod to update was not found
      */
-    public VisualizationMethod updateVisualizationMethodAttributes(VisualizationMethod newAttributes, long idOfMethod) {
+    public VisualizationMethod updateVisualizationMethodAttributes(VisualizationMethod newAttributes, long idOfMethod) throws VisualizationMethodNotFoundException {
+        if (!visualizationMethodRepository.exists(idOfMethod))
+            throw new VisualizationMethodNotFoundException("The VisualizationMethod with the id: " + idOfMethod + " does not exist!");
+
         VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(idOfMethod);
         // update the name of the method
         if (newAttributes.getName() != null && !newAttributes.getName().isEmpty())
@@ -165,31 +180,30 @@ public class VisualizationFrameworkService {
         if (newAttributes.getImplementingClass() != null && !newAttributes.getImplementingClass().isEmpty())
             visualizationMethod.setImplementingClass(newAttributes.getImplementingClass());
 
-        if(newAttributes.getDataTransformerMethod()!=null){
-            DataTransformerMethod newDataTransformerMethod = dataTransformerMethodRepository.findOne(newAttributes.getDataTransformerMethod().getId());
-            //finally set the data transformer method
-            visualizationMethod.setDataTransformerMethod(newDataTransformerMethod);
+        if (newAttributes.getDataTransformerMethod() != null) {
+            if (dataTransformerMethodRepository.exists(newAttributes.getDataTransformerMethod().getId())) {
+                DataTransformerMethod newDataTransformerMethod = dataTransformerMethodRepository.findOne(newAttributes.getDataTransformerMethod().getId());
+                //finally set the data transformer method
+                visualizationMethod.setDataTransformerMethod(newDataTransformerMethod);
+            }
         }
-
-        //TODO: WRONG, you will modify the datatransformer attributes that other visualization methods are referring to, therefore just change the link b/w the transformer and the vis method
-        /*if (newAttributes.getDataTransformerMethod().getName() != null && !newAttributes.getDataTransformerMethod().getName().isEmpty())
-            dataTransformerMethod.setName(newAttributes.getDataTransformerMethod().getName());
-
-        if (newAttributes.getDataTransformerMethod().getImplementingClass() != null && !newAttributes.getDataTransformerMethod().getImplementingClass().isEmpty())
-            dataTransformerMethod.setImplementingClass(newAttributes.getDataTransformerMethod().getImplementingClass());*/
-
         //commit the changes
         return visualizationMethodRepository.save(visualizationMethod);
     }
 
     /**
-     * Updates the attributes of visualization framework
+     * Updates the attributes of a VisualizationFramework
      *
      * @param newAttributes An instance filled with the new values of the visualization framework. Only the attributes namely, description and uploadedBy can be
      *                      updated
-     * @param idOfFramework the id of the visualization framework to be updated
+     * @param idOfFramework the id of the VisualizationFramework to be updated
+     * @return The updated VisualizationFramework object
+     * @throws VisualizationFrameworkNotFoundException If the VisualizationFramework to update was not found
      */
-    public VisualizationFramework updateVisualizationFrameworkAttributes(VisualizationFramework newAttributes, long idOfFramework) {
+    public VisualizationFramework updateVisualizationFrameworkAttributes(VisualizationFramework newAttributes, long idOfFramework) throws VisualizationFrameworkNotFoundException {
+        if (!visualizationFrameworkRepository.exists(idOfFramework))
+            throw new VisualizationFrameworkNotFoundException("The framework with id: " + idOfFramework + " does not exist!");
+
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(idOfFramework);
 
         if (newAttributes.getDescription() != null && !newAttributes.getDescription().isEmpty())
@@ -201,11 +215,11 @@ public class VisualizationFrameworkService {
     }
 
     /**
-     * Validates the configuration of the visualization method (i.e. the inputs that it accepts) with the provided OLAPPortConfiguration.
+     * Validates the configuration of the VisualizationMethod (i.e. the inputs that it accepts) with the provided OLAPPortConfiguration.
      *
-     * @param visualizationMethodId The id of the method for which to validate the configuration
+     * @param visualizationMethodId The id of the VisualizationMethod for which to validate the configuration
      * @param olapPortConfiguration The OLAPPortConfiguration against which to validate the method configuration
-     * @return true if the the provided port configuration matches the configuration of the visualization method
+     * @return true if the the provided port configuration matches the configuration of the VisualizationMethod
      * @throws DataSetValidationException If the validation encountered an error
      */
     public boolean validateVisualizationMethodConfiguration(long visualizationMethodId, OLAPPortConfiguration olapPortConfiguration) throws DataSetValidationException {

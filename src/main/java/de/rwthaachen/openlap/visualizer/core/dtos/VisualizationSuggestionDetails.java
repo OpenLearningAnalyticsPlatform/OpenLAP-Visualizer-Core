@@ -5,6 +5,7 @@ package de.rwthaachen.openlap.visualizer.core.dtos;
  */
 public class VisualizationSuggestionDetails {
 
+    private long suggestionId;
     private long methodId;
     private String methodName;
     private long frameworkId;
@@ -40,5 +41,13 @@ public class VisualizationSuggestionDetails {
 
     public void setFrameworkId(long frameworkId) {
         this.frameworkId = frameworkId;
+    }
+
+    public long getSuggestionId() {
+        return suggestionId;
+    }
+
+    public void setSuggestionId(long suggestionId) {
+        this.suggestionId = suggestionId;
     }
 }

@@ -1,8 +1,5 @@
 package de.rwthaachen.openlap.visualizer.core.exceptions;
 
-/**
- * Created by bas on 1/13/16.
- */
 public class VisualizationCodeGenerationException extends BaseException {
 
     public VisualizationCodeGenerationException(String message) {

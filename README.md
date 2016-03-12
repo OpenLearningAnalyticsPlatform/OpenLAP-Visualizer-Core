@@ -13,8 +13,6 @@ The following table lists the endpoints exposed by the Visualizer.
 
 * * *
 
-<div id="components">
-
 ## Components
 
 ### Component
@@ -29,11 +27,7 @@ The following table lists the endpoints exposed by the Visualizer.
 | [de.rwthaachen.openlap.visualizer.core.service.VisualizationFrameworkService](./de/rwthaachen/openlap/visualizer/core/service/VisualizationFrameworkService.html) | `A service which provides functions to perform CRUD operations on the Visualization Frameworks or Visualization Methods.` |
 | [de.rwthaachen.openlap.visualizer.core.service.VisualizationSuggestionService](./de/rwthaachen/openlap/visualizer/core/service/VisualizationSuggestionService.html) | `A service which provides functions to perform CRUD operations on the VisualizationSuggestions` |
 
-</div>
-
 * * *
-
-<div id="request-mappings">
 
 ## Request Mappings
 
@@ -54,8 +48,6 @@ The following table lists the endpoints exposed by the Visualizer.
 | PUT | "/suggestions/{idOfSuggestion}" | [de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController](./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html) |
 | DELETE | "/suggestions/{idOfSuggestion}" | [de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController](./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html) |
 | GET | "index" | [de.rwthaachen.openlap.visualizer.core.controller.ClientController](./de/rwthaachen/openlap/visualizer/core/controller/ClientController.html) |
-
-</div>
 
 * * *
 

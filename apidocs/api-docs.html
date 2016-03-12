@@ -1,0 +1,243 @@
+<html>
+  <head>
+    <title>Spring Artifacts</title>
+    <link rel='stylesheet' type='text/css' href='./api-docs.css' />
+  </head>
+  <body>
+    <h1>Spring Artifacts</h1>
+    <hr />
+    <div id='components'>
+      <h2>Components</h2>
+      <h3>Component</h3>
+      <table id='Component'>
+        <tr>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/service/DBConfiguration.html'>de.rwthaachen.openlap.visualizer.core.service.DBConfiguration</a>
+          </td>
+          <td>
+            <code>Development configuration class which makes it possible to access h2 database web console</code>
+          </td>
+        </tr>
+      </table>
+      <h3>Service</h3>
+      <table id='Service'>
+        <tr>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/service/ConfigurationService.html'>de.rwthaachen.openlap.visualizer.core.service.ConfigurationService</a>
+          </td>
+          <td>
+            <code>Service which contains the configuration parameters of the System.</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/service/FileManager.html'>de.rwthaachen.openlap.visualizer.core.service.FileManager</a>
+          </td>
+          <td>
+            <code>A service which provides functions to perform operations on the system's storage.</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/service/VisualizationEngineService.html'>de.rwthaachen.openlap.visualizer.core.service.VisualizationEngineService</a>
+          </td>
+          <td>
+            <code>Service which provides methods to generate visualization code.</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/service/VisualizationFrameworkService.html'>de.rwthaachen.openlap.visualizer.core.service.VisualizationFrameworkService</a>
+          </td>
+          <td>
+            <code>A service which provides functions to perform CRUD operations on the Visualization Frameworks or Visualization Methods.</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/service/VisualizationSuggestionService.html'>de.rwthaachen.openlap.visualizer.core.service.VisualizationSuggestionService</a>
+          </td>
+          <td>
+            <code>A service which provides functions to perform CRUD operations on the VisualizationSuggestions</code>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <div id='request-mappings'>
+      <h2>Request Mappings</h2>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>URL Template</th>
+          <th>Class</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>"/frameworks/list"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>"/frameworks/upload"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>"/frameworks/{idOfFramework}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>"/frameworks/{idOfFramework}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>"/frameworks/{idOfFramework}/methods/{idOfMethod}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>"/frameworks/{idOfFramework}/methods/{idOfMethod}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code>update only the attributes such as description, data transformer of the method</code>
+          </td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>"/frameworks/{idOfFramework}/methods/{idOfMethod}/configuration"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>"/frameworks/{idOfFramework}/methods/{idOfMethod}/validateConfiguration"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>"/frameworks/{idOfFramework}/update"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationFrameworkController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationFrameworkController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>"/generateVisualizationCode"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationEngineController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationEngineController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>"/suggestions/list"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>"/suggestions/new"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>"/suggestions/{idOfSuggestion}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>"/suggestions/{idOfSuggestion}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>"/suggestions/{idOfSuggestion}"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/VisualizationSuggestionController.html'>de.rwthaachen.openlap.visualizer.core.controller.VisualizationSuggestionController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>"index"</td>
+          <td>
+            <a href='./de/rwthaachen/openlap/visualizer/core/controller/ClientController.html'>de.rwthaachen.openlap.visualizer.core.controller.ClientController</a>
+          </td>
+          <td>
+            <code> </code>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <p>Generated by 
+      <a href='http://scottfrederick.github.com/springdoclet/'>SpringDoclet</a>
+    </p>
+  </body>
+</html>

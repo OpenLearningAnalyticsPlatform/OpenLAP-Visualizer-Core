@@ -1,0 +1,12 @@
+de.rwthaachen.openlap.visualizer
+de.rwthaachen.openlap.visualizer.core.controller
+de.rwthaachen.openlap.visualizer.core.dao
+de.rwthaachen.openlap.visualizer.core.dtos
+de.rwthaachen.openlap.visualizer.core.dtos.error
+de.rwthaachen.openlap.visualizer.core.dtos.request
+de.rwthaachen.openlap.visualizer.core.dtos.response
+de.rwthaachen.openlap.visualizer.core.exceptions
+de.rwthaachen.openlap.visualizer.core.framework.factory
+de.rwthaachen.openlap.visualizer.core.framework.validators
+de.rwthaachen.openlap.visualizer.core.model
+de.rwthaachen.openlap.visualizer.core.service

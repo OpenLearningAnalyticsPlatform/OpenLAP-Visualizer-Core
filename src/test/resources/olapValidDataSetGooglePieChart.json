@@ -7,11 +7,11 @@
          "required": true
        },
        "data": [
-         "Sport Activity",
-         "Gym",
-         "Football",
-         "Rugby",
-         "Swimming"
+         "Learning Platform",
+         "L2P",
+         "edX",
+         "AachenLearningPlatform",
+         "OpenOnlineInstitute"
        ]
      },
      "count": {

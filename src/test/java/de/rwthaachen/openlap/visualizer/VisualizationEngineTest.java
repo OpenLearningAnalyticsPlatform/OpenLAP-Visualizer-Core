@@ -29,7 +29,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Optional;
-import java.util.Random;
 
 import static junit.framework.TestCase.fail;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

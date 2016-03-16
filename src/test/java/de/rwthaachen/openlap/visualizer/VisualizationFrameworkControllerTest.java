@@ -8,7 +8,6 @@ import de.rwthaachen.openlap.visualizer.core.dtos.request.UploadVisualizationFra
 import de.rwthaachen.openlap.visualizer.core.dtos.request.ValidateVisualizationMethodConfigurationRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.*;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

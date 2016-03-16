@@ -14,6 +14,7 @@ import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -37,7 +38,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findByName(frameworkName);
 
         Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
@@ -53,7 +54,7 @@ public class VisualizationEngineService {
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationFramework.getFrameworkLocation());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClass());
             DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClass());
-            return codeGenerator.generateVisualizationCode(dataSet, dataTransformer);
+            return codeGenerator.generateVisualizationCode(dataSet, dataTransformer, additionalParams);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + methodName + " for the framework: " + frameworkName + " was not found");
         }
@@ -68,7 +69,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(frameworkId);
 
         Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
@@ -83,7 +84,7 @@ public class VisualizationEngineService {
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationFramework.getFrameworkLocation());
             DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClass());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClass());
-            return codeGenerator.generateVisualizationCode(olapDataSet, dataTransformer);
+            return codeGenerator.generateVisualizationCode(olapDataSet, dataTransformer, additionalParams);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + methodId + " for the framework: " + frameworkId + " was not found");
         }

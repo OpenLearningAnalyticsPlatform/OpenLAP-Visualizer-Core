@@ -3,6 +3,8 @@ package de.rwthaachen.openlap.visualizer.core.dtos.request;
 import DataSet.OLAPDataSet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Map;
+
 /**
  * Created by bas on 1/13/16.
  */
@@ -14,6 +16,7 @@ public class GenerateVisualizationCodeRequest {
     private long frameworkId;
     private long methodId;
     private OLAPDataSet dataSet;
+    private Map<String,Object> params;
 
     public OLAPDataSet getDataSet() {
         return dataSet;
@@ -53,5 +56,11 @@ public class GenerateVisualizationCodeRequest {
 
     public void setMethodId(long methodId) {
         this.methodId = methodId;
+    }
+
+    public Map<String,Object> getAdditionalParameters() { return params; }
+
+    public void setAdditionalParameters(Map<String,Object> params) {
+        this.params = params;
     }
 }

@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.OpenLearningAnalyticsPlatform</groupId>
             <artifactId>OpenLAP-Visualizer-Framework</artifactId>
-            <version>v1.1</version>
+            <version>47a985a</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

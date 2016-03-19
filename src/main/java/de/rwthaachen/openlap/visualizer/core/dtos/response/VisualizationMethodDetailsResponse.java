@@ -1,10 +1,9 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
 
-/**
- * Created by bas on 1/15/16.
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VisualizationMethodDetailsResponse {
 
     private VisualizationMethod visualizationMethod;

@@ -1,10 +1,9 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.request;
 
 import DataSet.OLAPPortConfiguration;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * Created by bas on 1/19/16.
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidateVisualizationMethodConfigurationRequest {
 
     private OLAPPortConfiguration configurationMapping;

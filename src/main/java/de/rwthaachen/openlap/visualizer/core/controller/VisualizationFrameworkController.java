@@ -41,7 +41,7 @@ public class VisualizationFrameworkController {
     }
 
     @RequestMapping(value = "/{idOfFramework}", method = RequestMethod.DELETE)
-    public DeleteVisualizationFrameworkResponse deleteVisualizationFramework(@PathVariable String idOfFramework) {
+    public DeleteVisualizationFrameworkResponse deleteVisualizationFramework(@PathVariable Long idOfFramework) {
         DeleteVisualizationFrameworkResponse response = new DeleteVisualizationFrameworkResponse();
         response.setSuccess(visualizationFrameworkService.deleteVisualizationFramework(idOfFramework));
         return response;
@@ -79,9 +79,20 @@ public class VisualizationFrameworkController {
         return response;
     }
 
-    /**
-     * update only the attributes such as description, data transformer of the method
-     */
+    @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.DELETE)
+    public DeleteVisualizationMethodResponse deleteVisualizationMethod(@PathVariable Long idOfMethod) {
+        DeleteVisualizationMethodResponse response = new DeleteVisualizationMethodResponse();
+        response.setSuccess(visualizationFrameworkService.deleteVisualizationMethod(idOfMethod));
+        return response;
+    }
+
+    @RequestMapping(value = "/{idOfFramework}/data_transformer/{idOfTransformer}", method = RequestMethod.DELETE)
+    public DeleteDataTransformerResponse deleteDataTransformer(@PathVariable Long idOfTransformer) {
+        DeleteDataTransformerResponse response = new DeleteDataTransformerResponse();
+        response.setSuccess(visualizationFrameworkService.deleteDataTransformer(idOfTransformer));
+        return response;
+    }
+
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.PUT)
     public UpdateVisualizationMethodResponse updateVisualizationFrameworkMethod(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod, @RequestBody UpdateVisualizationMethodRequest updateVisualizationMethodRequest) {
         UpdateVisualizationMethodResponse response = new UpdateVisualizationMethodResponse();

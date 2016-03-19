@@ -1,12 +1,11 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
 
 import java.util.List;
 
-/**
- * Request DTO representing the contents of an incoming request to upload visualization frameworks
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UploadVisualizationFrameworksRequest {
 
     private List<VisualizationFramework> visualizationFrameworks;

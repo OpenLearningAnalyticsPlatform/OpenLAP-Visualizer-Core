@@ -1,9 +1,9 @@
 {
    "columns": {
-     "users": {
+     "xAxisStrings": {
        "configurationData": {
          "type": "STRING",
-         "id": "wiki_user",
+         "id": "xAxisStrings",
          "required": true
        },
        "data": [
@@ -13,10 +13,10 @@
          "user4"
        ]
      },
-     "count": {
+     "yAxisValues": {
        "configurationData": {
          "type": "INTEGER",
-         "id": "num_of_posts",
+         "id": "yAxisValues",
          "required": true
        },
        "data": [

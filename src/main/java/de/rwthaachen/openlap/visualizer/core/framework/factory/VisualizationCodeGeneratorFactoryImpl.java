@@ -30,14 +30,26 @@ public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeG
         try {
             jarClassLoader.add(new FileInputStream(new File(locationOfJar)));
         }catch (IOException ioException){
-            throw new DataTransformerCreationException(ioException.getMessage());
+            throw new VisualizationCodeGeneratorCreationException(ioException.getMessage());
         }
         initializeClassLoader();
     }
 
+    public VisualizationCodeGeneratorFactoryImpl(){}
+
     public VisualizationCodeGeneratorFactoryImpl(InputStream jarStream){
         jarClassLoader = new JarClassLoader();
         jarClassLoader.add(jarStream);
+        initializeClassLoader();
+    }
+
+    public void setupVisualizationCodeGeneratorFactoryImpl(String locationOfJar){
+        jarClassLoader = new JarClassLoader();
+        try {
+            jarClassLoader.add(new FileInputStream(new File(locationOfJar)));
+        }catch (IOException ioException){
+            throw new VisualizationCodeGeneratorCreationException(ioException.getMessage());
+        }
         initializeClassLoader();
     }
 

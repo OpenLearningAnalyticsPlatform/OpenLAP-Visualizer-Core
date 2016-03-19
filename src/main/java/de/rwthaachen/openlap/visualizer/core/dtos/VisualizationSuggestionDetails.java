@@ -1,8 +1,8 @@
 package de.rwthaachen.openlap.visualizer.core.dtos;
 
-/**
- * Created by bas on 1/29/16.
- */
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VisualizationSuggestionDetails {
 
     private long suggestionId;

@@ -8,7 +8,6 @@ import de.rwthaachen.openlap.visualizer.OpenLAPVisualizerApplication;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationSuggestionRepository;
 import de.rwthaachen.openlap.visualizer.core.dtos.VisualizationSuggestionDetails;
-import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationFrameworkDeletionException;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationSuggestionCreationException;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationSuggestionNotFoundException;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
@@ -38,13 +37,12 @@ public class VisualizationSuggestionService {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Finds and returns a list of VisualizationSuggestions matching the provided OLAPPortConfiguration
+     * Finds and returns a list of VisualizationSuggestions matching the provided OpenLAPDataSet
      *
-     * @param olapPortConfiguration The OLAPPortConfiguration for which to search VisualizationSuggestion for
-     * @return list of VisualizationSuggestions matching the OLAPPortConfiguration
-     * @throws VisualizationFrameworkDeletionException if the deletion of the VisualizationFramework encountered problems such as the file couldn't be removed
+     * @param openLAPDataSet The OpenLAPDataSet for which to search VisualizationSuggestion for
+     * @return list of VisualizationSuggestions matching the OpenLAPDataSet
      */
-    public List<VisualizationSuggestionDetails> getSuggestionsForDataSetConfiguration(OLAPPortConfiguration olapPortConfiguration) {
+    public List<VisualizationSuggestionDetails> getSuggestionsForDataSetConfiguration(OLAPDataSet openLAPDataSet) {
         Iterable<VisualizationSuggestion> suggestionList = visualizationSuggestionRepository.findAll();
         List<VisualizationSuggestionDetails> matchedSuggestions = new ArrayList<>();
         suggestionList.forEach(suggestion -> {
@@ -52,7 +50,7 @@ public class VisualizationSuggestionService {
             try {
                 OLAPDataSet dataSet = objectMapper.readValue(suggestion.getOlapDataSetConfiguration(), OLAPDataSet.class);
                 // if the configuration matches then add it to the list
-                if (dataSet.validateConfiguration(olapPortConfiguration).isValid()) {
+                if (dataSet.compareToOLAPDataSet(openLAPDataSet)) {
                     VisualizationMethod visualizationMethod = suggestion.getVisualizationMethod();
                     VisualizationSuggestionDetails suggestionDetails = new VisualizationSuggestionDetails();
                     suggestionDetails.setSuggestionId(suggestion.getId());
@@ -69,6 +67,7 @@ public class VisualizationSuggestionService {
         });
         return matchedSuggestions;
     }
+
 
     /**
      * Finds and returns a VisualizationSuggestion matching the provided id
@@ -101,10 +100,7 @@ public class VisualizationSuggestionService {
     public boolean deleteVisualizationSuggestions(long suggestionId) throws VisualizationSuggestionNotFoundException {
         if (visualizationSuggestionRepository.exists(suggestionId)) {
             visualizationSuggestionRepository.delete(suggestionId);
-            if (visualizationSuggestionRepository.exists(suggestionId))
-                return false;
-            else
-                return true;
+            return visualizationSuggestionRepository.exists(suggestionId);
         } else
             throw new VisualizationSuggestionNotFoundException("Visualization suggestion with id: " + suggestionId + " not found.");
     }

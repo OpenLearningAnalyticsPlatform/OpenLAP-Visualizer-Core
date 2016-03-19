@@ -1,10 +1,9 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.request;
 
 import DataSet.OLAPDataSet;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * Created by bas on 1/28/16.
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AddNewVisualizationSuggestionRequest {
     private Long visualizationMethodId;
     private OLAPDataSet olapDataSet;

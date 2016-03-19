@@ -39,8 +39,8 @@ public class VisualizationSuggestionController {
         return response;
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public GetVisualizationSuggestionsResponse getSuggestionsForDataset(@RequestBody GetVisualizationSuggestionsRequest suggestionsRequest) {
+    @RequestMapping(value = "/listByDataSetConfiguration", method = RequestMethod.POST)
+    public GetVisualizationSuggestionsResponse getSuggestionsByDatasetConfiguration(@RequestBody GetVisualizationSuggestionsRequest suggestionsRequest) {
         GetVisualizationSuggestionsResponse response = new GetVisualizationSuggestionsResponse();
         List<VisualizationSuggestionDetails> visualizationSuggestionList = visualizationSuggestionService.getSuggestionsForDataSetConfiguration(suggestionsRequest.getDataSetConfiguration());
         response.setSuggestions(visualizationSuggestionList);

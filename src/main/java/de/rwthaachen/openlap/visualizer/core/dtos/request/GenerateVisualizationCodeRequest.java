@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Map;
 
-/**
- * Created by bas on 1/13/16.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GenerateVisualizationCodeRequest {
 

@@ -1,12 +1,11 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.rwthaachen.openlap.visualizer.core.dtos.VisualizationSuggestionDetails;
 
 import java.util.List;
 
-/**
- * Created by bas on 1/28/16.
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GetVisualizationSuggestionsResponse {
 
     private List<VisualizationSuggestionDetails> suggestions;

@@ -1,7 +1,9 @@
 package de.rwthaachen.openlap.visualizer.core.dtos;
 
 import DataSet.OLAPDataSet;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VisualizationMethodConfiguration {
 
     private OLAPDataSet input;

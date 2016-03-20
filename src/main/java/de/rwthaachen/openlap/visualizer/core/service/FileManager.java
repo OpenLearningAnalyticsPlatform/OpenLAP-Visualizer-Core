@@ -47,11 +47,13 @@ public class FileManager {
         fileName += configurationService.getJarBundleExtension(); //add the JAR extension
 
         try {
-            //create the the file storage directory if it does not exist
             Path fileStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation());
+            //create the the file storage directory if it does not exist
+            if(!fileStorageLocation.toFile().exists())
+                fileStorageLocation.toFile().mkdir();
 
-            FileUtils.copyInputStreamToFile(fileToSave.getInputStream(), Paths.get(fileStorageLocation.toString(), fileName).toFile());
-            Path fileFinalPath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName);
+            Path fileFinalPath = Paths.get(fileStorageLocation.toString(), fileName);
+            FileUtils.copyInputStreamToFile(fileToSave.getInputStream(), fileFinalPath.toFile());
 
             return fileFinalPath.toString();
         } catch (IOException | SecurityException exception) {
@@ -83,5 +85,14 @@ public class FileManager {
         } catch (IOException exception) {
             throw new FileManagerException(exception.getMessage());
         }
+    }
+
+    /**
+     * Checks if a file already exists in the system's storage
+     * @param fileName The name of the file to check
+     * */
+    public boolean fileExists(String fileName){
+        Path filePath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName+configurationService.getJarBundleExtension());
+        return Files.exists(filePath);
     }
 }

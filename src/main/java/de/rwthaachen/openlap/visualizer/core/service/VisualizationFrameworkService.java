@@ -114,7 +114,10 @@ public class VisualizationFrameworkService {
                 Path fileName = Paths.get(jarFile.getOriginalFilename()).getFileName();
                 String savedFilePath;
                 if (fileName != null) {
-                    savedFilePath = fileManager.saveJarFile(fileName.toString(), jarFile);
+                    if(!fileManager.fileExists(fileName.toString()))
+                        savedFilePath = fileManager.saveJarFile(fileName.toString(), jarFile);
+                    else
+                        throw new VisualizationFrameworkUploadException("The file being uploaded : "+fileName.toString()+"  already exists, consider renaming it.");
                 } else {
                     savedFilePath = fileManager.saveJarFile("", jarFile);
                 }

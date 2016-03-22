@@ -20,10 +20,8 @@ import java.util.function.Predicate;
  *
  * @author Bassim Bashir
  */
-//TODO: convert the framework config to json and encapsulate it in the exception to send back to the client upon failure of validation
 public class VisualizationFrameworksUploadValidator {
 
-    //TODO: return information about why the validation failed!!!
     public boolean validateVisualizationFrameworksUploadConfiguration(List<VisualizationFramework> frameworksConfig, MultipartFile frameworksJar) throws VisualizationFrameworkUploadException {
         // first step of validation, check if all the fields are not null
         if (frameworksConfig.stream().filter(new Predicate<VisualizationFramework>() {

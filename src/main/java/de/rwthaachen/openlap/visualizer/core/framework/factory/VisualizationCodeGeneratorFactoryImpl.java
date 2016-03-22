@@ -27,11 +27,12 @@ public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeG
 
     public VisualizationCodeGeneratorFactoryImpl(String locationOfJar){
         jarClassLoader = new JarClassLoader();
-        try {
+       /* try {
             jarClassLoader.add(new FileInputStream(new File(locationOfJar)));
         }catch (IOException ioException){
             throw new VisualizationCodeGeneratorCreationException(ioException.getMessage());
-        }
+        }*/
+        jarClassLoader.add(locationOfJar);
         initializeClassLoader();
     }
 
@@ -54,14 +55,18 @@ public class VisualizationCodeGeneratorFactoryImpl implements VisualizationCodeG
     }
 
     private void initializeClassLoader() {
-        jarClassLoader.getThreadLoader().setOrder(1);
+        /*jarClassLoader.getThreadLoader().setOrder(1);
         jarClassLoader.getCurrentLoader().setOrder(2);
 
         jarClassLoader.getParentLoader().setEnabled(false);
         jarClassLoader.getSystemLoader().setEnabled(false);
-        jarClassLoader.getLocalLoader().setEnabled(false);
+        jarClassLoader.getLocalLoader().setEnabled(false);*/
 
-
+        jarClassLoader.getParentLoader().setOrder(2);
+        jarClassLoader.getLocalLoader().setOrder(4);
+        jarClassLoader.getSystemLoader().setOrder(5);
+        jarClassLoader.getThreadLoader().setOrder(3);
+        jarClassLoader.getCurrentLoader().setOrder(1);
         // Set default to cglib (from version 2.2.1)
         ProxyProviderFactory.setDefaultProxyProvider(new CglibProxyProvider());
 

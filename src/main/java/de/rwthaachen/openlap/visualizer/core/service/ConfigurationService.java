@@ -13,9 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfigurationService {
 
-    @Value("${visualizationFrameworksJarStorageLocation}")
-    private String visualizationFrameworksJarStorageLocation;
-
     @Value("${fileManagerStorageLocation}")
     private String fileManagerStorageLocation;
 
@@ -28,13 +25,6 @@ public class ConfigurationService {
     @Value("${apiVersionNumber}")
     private String apiVersionNumber;
 
-    public String getVisualizationFrameworksJarStorageLocation() {
-        return visualizationFrameworksJarStorageLocation;
-    }
-
-    public void setVisualizationFrameworksJarStorageLocation(String visualizationFrameworksJarStorageLocation) {
-        this.visualizationFrameworksJarStorageLocation = visualizationFrameworksJarStorageLocation;
-    }
 
     public String getFileManagerStorageLocation() {
         return fileManagerStorageLocation;

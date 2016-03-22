@@ -114,10 +114,10 @@ public class VisualizationFrameworkService {
                 Path fileName = Paths.get(jarFile.getOriginalFilename()).getFileName();
                 String savedFilePath;
                 if (fileName != null) {
-                    if(!fileManager.fileExists(fileName.toString()))
+                    if (!fileManager.fileExists(fileName.toString()))
                         savedFilePath = fileManager.saveJarFile(fileName.toString(), jarFile);
                     else
-                        throw new VisualizationFrameworkUploadException("The file being uploaded : "+fileName.toString()+"  already exists, consider renaming it.");
+                        throw new VisualizationFrameworkUploadException("The file being uploaded : " + fileName.toString() + "  already exists, consider renaming it.");
                 } else {
                     savedFilePath = fileManager.saveJarFile("", jarFile);
                 }
@@ -136,8 +136,16 @@ public class VisualizationFrameworkService {
                 frameworkList.forEach(framework -> {
                     framework.getVisualizationMethods().forEach(visualizationMethod -> {
                         try {
-                            OLAPDataSet inputDataSet = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass()).getInput();
-                            if (inputDataSet.getColumnsConfigurationData().size() != 0) {
+                            // serialize and de-serialize the DataSet to avoid the issue with the ClassCastException, because the VisualizationCodeGenerator is loaded in another class loader
+                            //and the OLAPDataSet in this piece code is loaded in another.
+                            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
+                            OLAPDataSet inputDataSet = null;
+                            try {
+                                inputDataSet = objectMapper.readValue(codeGenerator.getInputAsJsonString(), OLAPDataSet.class);
+                            } catch (IOException ex) {
+                                log.error("Error in deserializing codegenerator input config.Not adding method:" + visualizationMethod.getName() + ", to suggestions", ex);
+                            }
+                            if (inputDataSet != null && inputDataSet.getColumnsConfigurationData().size() != 0) {
                                 VisualizationSuggestion visualizationSuggestion = new VisualizationSuggestion();
                                 visualizationSuggestion.setVisualizationMethod(visualizationMethod);
                                 visualizationSuggestion.setOlapDataSetConfiguration(objectMapper.writeValueAsString(inputDataSet));
@@ -193,7 +201,7 @@ public class VisualizationFrameworkService {
             }
         }
 
-        return visualizationFrameworkRepository.exists(idOfFramework);
+        return !visualizationFrameworkRepository.exists(idOfFramework);
     }
 
     /**
@@ -216,7 +224,7 @@ public class VisualizationFrameworkService {
         //finally delete the vis method
         visualizationMethodRepository.delete(idOfMethod);
 
-        return visualizationMethodRepository.exists(idOfMethod);
+        return !visualizationMethodRepository.exists(idOfMethod);
     }
 
     /**
@@ -227,13 +235,13 @@ public class VisualizationFrameworkService {
      * @throws DataTransformerDeletionException if the deletion of the DataTransformer encountered problems
      */
     @Transactional(rollbackFor = {RuntimeException.class})
-    public boolean deleteDataTransformer(long idOfTransformer) throws DataTransformerDeletionException{
-        if(!dataTransformerMethodRepository.exists(idOfTransformer))
+    public boolean deleteDataTransformer(long idOfTransformer) throws DataTransformerDeletionException {
+        if (!dataTransformerMethodRepository.exists(idOfTransformer))
             throw new DataTransformerDeletionException("Could not delete the data transformer with id: " + idOfTransformer + ", not found");
 
         dataTransformerMethodRepository.delete(idOfTransformer);
 
-        return dataTransformerMethodRepository.exists(idOfTransformer);
+        return !dataTransformerMethodRepository.exists(idOfTransformer);
     }
 
     /**
@@ -343,9 +351,19 @@ public class VisualizationFrameworkService {
         //ask the factories for the instance
         visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
         VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
+        // serialize and de-serialize the DataSet to avoid the issue with the ClassCastException, because the VisualizationCodeGenerator is loaded in another class loader
+        //and the OLAPDataSet in this piece code is loaded in another.
+        OLAPDataSet inputDataSet = null;
+        OLAPDataSet outputDataSet = null;
+        try {
+            inputDataSet = objectMapper.readValue(codeGenerator.getInputAsJsonString(), OLAPDataSet.class);
+            // outputDataSet = objectMapper.readValue(codeGenerator.getOutputAsJsonString(), OLAPDataSet.class);
+        } catch (IOException ex) {
+            log.error("Error in deserializing codegenerator input/output config.", ex);
+        }
         VisualizationMethodConfiguration visualizationMethodConfiguration = new VisualizationMethodConfiguration();
-        visualizationMethodConfiguration.setInput(codeGenerator.getInput());
-        visualizationMethodConfiguration.setOutput(codeGenerator.getOutput());
+        visualizationMethodConfiguration.setInput(inputDataSet);
+        visualizationMethodConfiguration.setOutput(outputDataSet);
         return visualizationMethodConfiguration;
     }
 }

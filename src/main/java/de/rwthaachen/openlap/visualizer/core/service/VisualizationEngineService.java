@@ -1,6 +1,7 @@
 package de.rwthaachen.openlap.visualizer.core.service;
 
 import DataSet.OLAPDataSet;
+import DataSet.OLAPPortConfiguration;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationFrameworkRepository;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationCodeGenerationException;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.DataTransformerFactory;
@@ -38,7 +39,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet, OLAPPortConfiguration portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findByName(frameworkName);
 
         Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
@@ -54,7 +55,7 @@ public class VisualizationEngineService {
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationFramework.getFrameworkLocation());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClass());
             DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClass());
-            return codeGenerator.generateVisualizationCode(dataSet, dataTransformer, additionalParams);
+            return codeGenerator.generateVisualizationCode(dataSet,portConfiguration, dataTransformer, additionalParams);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + methodName + " for the framework: " + frameworkName + " was not found");
         }
@@ -69,7 +70,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet, OLAPPortConfiguration portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(frameworkId);
 
         Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
@@ -84,7 +85,7 @@ public class VisualizationEngineService {
             VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationFramework.getFrameworkLocation());
             DataTransformer dataTransformer = dataTransformerFactory.createDataTransformer(visMethod.getDataTransformerMethod().getImplementingClass());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visMethod.getImplementingClass());
-            return codeGenerator.generateVisualizationCode(olapDataSet, dataTransformer, additionalParams);
+            return codeGenerator.generateVisualizationCode(olapDataSet,portConfiguration, dataTransformer, additionalParams);
         } else {
             throw new VisualizationCodeGenerationException("The method: " + methodId + " for the framework: " + frameworkId + " was not found");
         }

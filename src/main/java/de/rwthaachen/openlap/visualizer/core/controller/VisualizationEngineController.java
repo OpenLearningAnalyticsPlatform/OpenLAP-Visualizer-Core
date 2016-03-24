@@ -33,9 +33,9 @@ public class VisualizationEngineController {
         //check which service method to invoke
         if (generateVisualizationCodeRequest.getFrameworkName() != null && !generateVisualizationCodeRequest.getFrameworkName().isEmpty()
                 && generateVisualizationCodeRequest.getMethodName() != null && !generateVisualizationCodeRequest.getMethodName().isEmpty())
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkName(), generateVisualizationCodeRequest.getMethodName(), generateVisualizationCodeRequest.getDataSet(), generateVisualizationCodeRequest.getAdditionalParameters()));
+            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkName(), generateVisualizationCodeRequest.getMethodName(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getAdditionalParameters()));
         else
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(), generateVisualizationCodeRequest.getMethodId(), generateVisualizationCodeRequest.getDataSet(), generateVisualizationCodeRequest.getAdditionalParameters()));
+            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(), generateVisualizationCodeRequest.getMethodId(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getAdditionalParameters()));
         return visualizationCodeResponse;
     }
 

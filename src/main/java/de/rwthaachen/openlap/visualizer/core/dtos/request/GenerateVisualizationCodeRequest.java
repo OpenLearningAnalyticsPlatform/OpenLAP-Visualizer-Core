@@ -1,6 +1,7 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.request;
 
 import DataSet.OLAPDataSet;
+import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Map;
@@ -13,6 +14,7 @@ public class GenerateVisualizationCodeRequest {
     private long frameworkId;
     private long methodId;
     private OLAPDataSet dataSet;
+    private OLAPPortConfiguration portConfiguration;
     private Map<String,Object> params;
 
     public OLAPDataSet getDataSet() {
@@ -59,5 +61,13 @@ public class GenerateVisualizationCodeRequest {
 
     public void setAdditionalParameters(Map<String,Object> params) {
         this.params = params;
+    }
+
+    public OLAPPortConfiguration getPortConfiguration() {
+        return portConfiguration;
+    }
+
+    public void setPortConfiguration(OLAPPortConfiguration portConfiguration) {
+        this.portConfiguration = portConfiguration;
     }
 }

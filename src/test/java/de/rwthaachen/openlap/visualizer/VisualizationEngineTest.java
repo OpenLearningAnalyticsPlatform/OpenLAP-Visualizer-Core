@@ -1,8 +1,8 @@
 package de.rwthaachen.openlap.visualizer;
 
-import DataSet.OLAPDataSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.GenerateVisualizationCodeRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.GenerateVisualizationCodeResponse;
 import de.rwthaachen.openlap.visualizer.core.dtos.response.VisualizationFrameworksDetailsResponse;
@@ -79,7 +79,7 @@ public class VisualizationEngineTest {
                 .filter((framework) -> framework.getName().equals(frameworkName))
                 .findFirst();
         if(visualizationFramework.isPresent()){
-            OLAPDataSet sampleDataSet = objectMapper.readValue(new File(getClass().getClassLoader().getResource(olapDataSetSampleFile).toURI()), OLAPDataSet.class);
+            OpenLAPDataSet sampleDataSet = objectMapper.readValue(new File(getClass().getClassLoader().getResource(olapDataSetSampleFile).toURI()), OpenLAPDataSet.class);
             GenerateVisualizationCodeRequest generateVisualizationCodeRequest = new GenerateVisualizationCodeRequest();
             generateVisualizationCodeRequest.setDataSet(sampleDataSet);
             generateVisualizationCodeRequest.setFrameworkId(visualizationFramework.get().getId());

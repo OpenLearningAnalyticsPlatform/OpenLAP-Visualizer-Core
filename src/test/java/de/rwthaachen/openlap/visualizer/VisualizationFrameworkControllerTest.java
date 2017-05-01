@@ -1,8 +1,8 @@
 package de.rwthaachen.openlap.visualizer;
 
-import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import de.rwthaachen.openlap.dataset.OpenLAPPortConfig;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationFrameworkRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UploadVisualizationFrameworksRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.ValidateVisualizationMethodConfigurationRequest;
@@ -232,7 +232,7 @@ public class VisualizationFrameworkControllerTest {
         logTestHeader(VALIDATE_CONFIGURATION_ENDPOINT);
         List<VisualizationFramework> frameworkList = listOfVisualizationFrameworks();
         ValidateVisualizationMethodConfigurationRequest validateVisualizationMethodConfigurationRequest = new ValidateVisualizationMethodConfigurationRequest();
-        OLAPPortConfiguration olapPortConfiguration = objectMapper.readValue(new File(getClass().getClassLoader().getResource(VALID_PORT_CONFIG_D3_BAR_CHART).toURI()),OLAPPortConfiguration.class);
+        OpenLAPPortConfig olapPortConfiguration = objectMapper.readValue(new File(getClass().getClassLoader().getResource(VALID_PORT_CONFIG_D3_BAR_CHART).toURI()),OpenLAPPortConfig.class);
         validateVisualizationMethodConfigurationRequest.setConfigurationMapping(olapPortConfiguration);
         
         logTestFooter(VALIDATE_CONFIGURATION_ENDPOINT);

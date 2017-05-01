@@ -1,27 +1,27 @@
 package de.rwthaachen.openlap.visualizer.core.dtos;
 
-import DataSet.OLAPDataSet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VisualizationMethodConfiguration {
 
-    private OLAPDataSet input;
-    private OLAPDataSet output;
+    private OpenLAPDataSet input;
+    private OpenLAPDataSet output;
 
-    public OLAPDataSet getInput() {
+    public OpenLAPDataSet getInput() {
         return input;
     }
 
-    public void setInput(OLAPDataSet input) {
+    public void setInput(OpenLAPDataSet input) {
         this.input = input;
     }
 
-    public OLAPDataSet getOutput() {
+    public OpenLAPDataSet getOutput() {
         return output;
     }
 
-    public void setOutput(OLAPDataSet output) {
+    public void setOutput(OpenLAPDataSet output) {
         this.output = output;
     }
 }

@@ -72,6 +72,11 @@ public class VisualizationFrameworkController {
         }
     }
 
+    @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}/frameworkScript", method = RequestMethod.GET)
+    public String GetFrameworkScript(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod) {
+        return visualizationFrameworkService.getFrameworkScript(idOfFramework, idOfMethod);
+    }
+
     @RequestMapping(value = "/{idOfFramework}/methods/{idOfMethod}", method = RequestMethod.GET)
     public VisualizationMethodDetailsResponse getFrameworkMethodDetails(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod) {
         VisualizationMethodDetailsResponse response = new VisualizationMethodDetailsResponse();
@@ -108,6 +113,10 @@ public class VisualizationFrameworkController {
 
             response.setConfigurationValid(visualizationFrameworkService.validateVisualizationMethodConfiguration(idOfMethod, validateVisualizationMethodConfigurationRequest.getConfigurationMapping()));
         } catch (DataSetValidationException exception) {
+            response.setConfigurationValid(false);
+            response.setValidationMessage(exception.getMessage());
+        }
+        catch (Exception exception) {
             response.setConfigurationValid(false);
             response.setValidationMessage(exception.getMessage());
         }

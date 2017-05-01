@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
  * Created by bas on 12/12/15.
  */
 public interface VisualizationMethodRepository extends CrudRepository<VisualizationMethod, Long> {
-
+    VisualizationMethod findByImplementingClass (String implementingClassName);
 }

@@ -1,7 +1,7 @@
 package de.rwthaachen.openlap.visualizer.core.service;
 
-import DataSet.OLAPDataSet;
-import DataSet.OLAPPortConfiguration;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
+import de.rwthaachen.openlap.dataset.OpenLAPPortConfig;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationFrameworkRepository;
 import de.rwthaachen.openlap.visualizer.core.exceptions.VisualizationCodeGenerationException;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.DataTransformerFactory;
@@ -39,7 +39,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(String frameworkName, String methodName, OLAPDataSet dataSet, OLAPPortConfiguration portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(String frameworkName, String methodName, OpenLAPDataSet dataSet, OpenLAPPortConfig portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findByName(frameworkName);
 
         Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()
@@ -70,7 +70,7 @@ public class VisualizationEngineService {
      * @return The client visualization code
      * @throws VisualizationCodeGenerationException If the generation of the visualization code was not successful
      */
-    public String generateClientVisualizationCode(long frameworkId, long methodId, OLAPDataSet olapDataSet, OLAPPortConfiguration portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
+    public String generateClientVisualizationCode(long frameworkId, long methodId, OpenLAPDataSet olapDataSet, OpenLAPPortConfig portConfiguration, Map<String, Object> additionalParams) throws VisualizationCodeGenerationException {
         VisualizationFramework visualizationFramework = visualizationFrameworkRepository.findOne(frameworkId);
 
         Optional<VisualizationMethod> visualizationMethod = visualizationFramework.getVisualizationMethods()

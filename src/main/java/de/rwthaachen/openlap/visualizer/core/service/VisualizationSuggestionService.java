@@ -1,9 +1,8 @@
 package de.rwthaachen.openlap.visualizer.core.service;
 
-import DataSet.OLAPDataSet;
-import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
 import de.rwthaachen.openlap.visualizer.OpenLAPVisualizerApplication;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationSuggestionRepository;
@@ -42,15 +41,15 @@ public class VisualizationSuggestionService {
      * @param openLAPDataSet The OpenLAPDataSet for which to search VisualizationSuggestion for
      * @return list of VisualizationSuggestions matching the OpenLAPDataSet
      */
-    public List<VisualizationSuggestionDetails> getSuggestionsForDataSetConfiguration(OLAPDataSet openLAPDataSet) {
+    public List<VisualizationSuggestionDetails> getSuggestionsForDataSetConfiguration(OpenLAPDataSet openLAPDataSet) {
         Iterable<VisualizationSuggestion> suggestionList = visualizationSuggestionRepository.findAll();
         List<VisualizationSuggestionDetails> matchedSuggestions = new ArrayList<>();
         suggestionList.forEach(suggestion -> {
             //convert the string json content into an object
             try {
-                OLAPDataSet dataSet = objectMapper.readValue(suggestion.getOlapDataSetConfiguration(), OLAPDataSet.class);
+                OpenLAPDataSet dataSet = objectMapper.readValue(suggestion.getOlapDataSetConfiguration(), OpenLAPDataSet.class);
                 // if the configuration matches then add it to the list
-                if (dataSet.compareToOLAPDataSet(openLAPDataSet)) {
+                if (dataSet.compareToOpenLAPDataSet(openLAPDataSet)) {
                     VisualizationMethod visualizationMethod = suggestion.getVisualizationMethod();
                     VisualizationSuggestionDetails suggestionDetails = new VisualizationSuggestionDetails();
                     suggestionDetails.setSuggestionId(suggestion.getId());
@@ -137,11 +136,11 @@ public class VisualizationSuggestionService {
      * Creates a new VisualizationSuggestion
      *
      * @param visualizationMethodId The id of the VisualizationMethod to which to attach the new VisualizationSuggestion to
-     * @param dataSet               The OLAPDataSet containing the configuration for which this new VisualizationSuggestion applies
+     * @param dataSet               The OpenLAPDataSet containing the configuration for which this new VisualizationSuggestion applies
      * @return the newly created instance of the VisualizationSuggestion
      * @throws VisualizationSuggestionCreationException if the creation of the VisualizationSuggestion failed
      */
-    public VisualizationSuggestion createVisualizationSuggestion(long visualizationMethodId, OLAPDataSet dataSet) throws VisualizationSuggestionCreationException {
+    public VisualizationSuggestion createVisualizationSuggestion(long visualizationMethodId, OpenLAPDataSet dataSet) throws VisualizationSuggestionCreationException {
         if (visualizationMethodRepository.exists(visualizationMethodId)) {
             if (dataSet != null) {
                 VisualizationSuggestion newVisualizationSuggestion = new VisualizationSuggestion();

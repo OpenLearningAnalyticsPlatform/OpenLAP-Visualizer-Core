@@ -56,12 +56,16 @@ public class VisualizationFrameworksUploadValidator {
         }
         //now try loading the classes and confirm if they implement the required interfaces
         try {
-            DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(frameworksJar.getInputStream());
-            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(frameworksJar.getInputStream());
+            //DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(frameworksJar.getInputStream());
+            //VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(frameworksJar.getInputStream());
             for (VisualizationFramework visualizationFramework : frameworksConfig) {
                 for (VisualizationMethod visualizationMethod : visualizationFramework.getVisualizationMethods()) {
                     //lets first check the code generator
                     try {
+                        //Need to optimize TODO
+                        VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(frameworksJar.getInputStream());
+                        DataTransformerFactory dataTransformerFactory = new DataTransformerFactoryImpl(frameworksJar.getInputStream());
+
                         if (visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass()) == null)
                             return false;
                         //now the data transformer

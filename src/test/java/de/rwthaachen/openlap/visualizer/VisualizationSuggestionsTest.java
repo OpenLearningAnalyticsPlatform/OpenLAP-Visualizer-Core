@@ -1,9 +1,9 @@
 package de.rwthaachen.openlap.visualizer;
 
-import DataSet.OLAPDataSet;
-import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
+import de.rwthaachen.openlap.dataset.OpenLAPPortConfig;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.AddNewVisualizationSuggestionRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.GetVisualizationSuggestionsRequest;
 import de.rwthaachen.openlap.visualizer.core.dtos.request.UpdateVisualizationSuggestionRequest;
@@ -88,7 +88,7 @@ public class VisualizationSuggestionsTest {
         //choose a method from the framework at random
         int randomMethodIndex = new Random().nextInt(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomFrameworkIndex).getVisualizationMethods().size());
         AddNewVisualizationSuggestionRequest addNewVisualizationSuggestionRequest = new AddNewVisualizationSuggestionRequest();
-        OLAPDataSet dataSet = objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_SAMPLE_OLAP_DATASET).toURI()), OLAPDataSet.class);
+        OpenLAPDataSet dataSet = objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_SAMPLE_OLAP_DATASET).toURI()), OpenLAPDataSet.class);
         addNewVisualizationSuggestionRequest.setOlapDataSet(dataSet);
         addNewVisualizationSuggestionRequest.setVisualizationMethodId(visualizationFrameworksDetailsResponse.getVisualizationFrameworks().get(randomFrameworkIndex).getVisualizationMethods().get(randomMethodIndex).getId());
         mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_VISUALIZATION_SUGGESTION_ENDPOINT)
@@ -105,7 +105,7 @@ public class VisualizationSuggestionsTest {
     public void getVisualizationSuggestionsByDatasetConfiguration() throws Exception{
         logTestHeader(GET_VISUALIZATION_SUGGESTION_BYDATASET_CONFIGURATION_ENDPOINT);
         GetVisualizationSuggestionsRequest getVisualizationSuggestionsRequest = new GetVisualizationSuggestionsRequest();
-        getVisualizationSuggestionsRequest.setDataSetConfiguration(objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_SAMPLE_OLAP_DATASET).toURI()), OLAPDataSet.class));
+        getVisualizationSuggestionsRequest.setDataSetConfiguration(objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_SAMPLE_OLAP_DATASET).toURI()), OpenLAPDataSet.class));
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(GET_VISUALIZATION_SUGGESTION_BYDATASET_CONFIGURATION_ENDPOINT)
                 .contentType(contentType)
                 .content(objectMapper.writeValueAsString(getVisualizationSuggestionsRequest)))
@@ -122,7 +122,7 @@ public class VisualizationSuggestionsTest {
         logTestHeader(DELETE_VISUALIZATION_SUGGESTION_ENDPOINT);
         // first get the list of visualization suggestions
         GetVisualizationSuggestionsRequest getVisualizationSuggestionsRequest = new GetVisualizationSuggestionsRequest();
-        getVisualizationSuggestionsRequest.setOlapPortConfiguration(objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_VALID_OLAP_PORT_CONFIG).toURI()), OLAPPortConfiguration.class));
+        getVisualizationSuggestionsRequest.setOlapPortConfiguration(objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_VALID_OLAP_PORT_CONFIG).toURI()), OpenLAPPortConfig.class));
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(GET_VISUALIZATION_SUGGESTION_BYPORT_CONFIGURATION_ENDPOINT)
                 .contentType(contentType)
                 .content(objectMapper.writeValueAsString(getVisualizationSuggestionsRequest)))
@@ -151,7 +151,7 @@ public class VisualizationSuggestionsTest {
         logTestHeader(UPDATE_VISUALIZATION_SUGGESTION_ENDPOINT);
         // first get the list of visualization suggestions
         GetVisualizationSuggestionsRequest getVisualizationSuggestionsRequest = new GetVisualizationSuggestionsRequest();
-        getVisualizationSuggestionsRequest.setOlapPortConfiguration(objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_VALID_OLAP_PORT_CONFIG).toURI()), OLAPPortConfiguration.class));
+        getVisualizationSuggestionsRequest.setOlapPortConfiguration(objectMapper.readValue(new File(getClass().getClassLoader().getResource(D3_BAR_CHART_VALID_OLAP_PORT_CONFIG).toURI()), OpenLAPPortConfig.class));
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(GET_VISUALIZATION_SUGGESTION_BYPORT_CONFIGURATION_ENDPOINT)
                 .contentType(contentType)
                 .content(objectMapper.writeValueAsString(getVisualizationSuggestionsRequest)))
@@ -167,7 +167,7 @@ public class VisualizationSuggestionsTest {
         String updateSuggestionURL = UPDATE_VISUALIZATION_SUGGESTION_ENDPOINT.replace("?", Long.toString(getVisualizationSuggestionsResponse.getSuggestions().get(randomSuggestionIndex).getSuggestionId()));
         UpdateVisualizationSuggestionRequest updateVisualizationSuggestionRequest = new UpdateVisualizationSuggestionRequest();
         VisualizationSuggestion newVisualizationSuggestion = new VisualizationSuggestion();
-        newVisualizationSuggestion.setOlapDataSetConfiguration(objectWriter.writeValueAsString((objectMapper.readValue(new File(getClass().getClassLoader().getResource(GOOGLE_PIE_CHART_SAMPLE_OLAP_DATASET).toURI()), OLAPDataSet.class))));
+        newVisualizationSuggestion.setOlapDataSetConfiguration(objectWriter.writeValueAsString((objectMapper.readValue(new File(getClass().getClassLoader().getResource(GOOGLE_PIE_CHART_SAMPLE_OLAP_DATASET).toURI()), OpenLAPDataSet.class))));
         updateVisualizationSuggestionRequest.setVisualizationSuggestion(newVisualizationSuggestion);
         mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(updateSuggestionURL)
                 .contentType(contentType)

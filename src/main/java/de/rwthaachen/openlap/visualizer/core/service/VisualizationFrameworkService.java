@@ -1,9 +1,9 @@
 package de.rwthaachen.openlap.visualizer.core.service;
 
-import DataSet.OLAPDataSet;
-import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
+import de.rwthaachen.openlap.dataset.OpenLAPPortConfig;
 import de.rwthaachen.openlap.visualizer.OpenLAPVisualizerApplication;
 import de.rwthaachen.openlap.visualizer.core.dao.DataTransformerMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationFrameworkRepository;
@@ -11,6 +11,7 @@ import de.rwthaachen.openlap.visualizer.core.dao.VisualizationMethodRepository;
 import de.rwthaachen.openlap.visualizer.core.dao.VisualizationSuggestionRepository;
 import de.rwthaachen.openlap.visualizer.core.dtos.VisualizationMethodConfiguration;
 import de.rwthaachen.openlap.visualizer.core.exceptions.*;
+import de.rwthaachen.openlap.visualizer.core.exceptions.DataSetValidationException;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactory;
 import de.rwthaachen.openlap.visualizer.core.framework.factory.VisualizationCodeGeneratorFactoryImpl;
 import de.rwthaachen.openlap.visualizer.core.framework.validators.VisualizationFrameworksUploadValidator;
@@ -18,7 +19,11 @@ import de.rwthaachen.openlap.visualizer.core.model.DataTransformerMethod;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationFramework;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationMethod;
 import de.rwthaachen.openlap.visualizer.core.model.VisualizationSuggestion;
+import de.rwthaachen.openlap.visualizer.framework.DataTransformer;
 import de.rwthaachen.openlap.visualizer.framework.VisualizationCodeGenerator;
+import de.rwthaachen.openlap.visualizer.framework.exceptions.*;
+import de.rwthaachen.openlap.visualizer.framework.exceptions.UnTransformableData;
+import de.rwthaachen.openlap.visualizer.framework.model.TransformedData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +63,9 @@ public class VisualizationFrameworkService {
     private VisualizationSuggestionRepository visualizationSuggestionRepository;
     @Autowired
     private FileManager fileManager;
-    private VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory;
+
+    //private VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory;
+
     private ObjectMapper objectMapper;
 
     @PostConstruct
@@ -96,6 +106,17 @@ public class VisualizationFrameworkService {
         return visualizationMethodRepository.findOne(visualizationMethodId);
     }
 
+    public String getFrameworkScript(Long idOfFramework, Long idOfMethod) {
+        VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(idOfMethod);
+        if (visualizationMethod != null) {
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
+            VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
+            return encodeURIComponent(codeGenerator.getVisualizationLibraryScript());
+        } else {
+            throw new DataSetValidationException("The visualization method represented by the id: " + idOfMethod + " not found.");
+        }
+    }
+
     /**
      * Performs the upload of the visualization framework by copying over the jar bundle and making the relevant Database entries
      *
@@ -117,7 +138,7 @@ public class VisualizationFrameworkService {
                     if (!fileManager.fileExists(fileName.toString()))
                         savedFilePath = fileManager.saveJarFile(fileName.toString(), jarFile);
                     else
-                        throw new VisualizationFrameworkUploadException("The file being uploaded : " + fileName.toString() + "  already exists, consider renaming it.");
+                        throw new VisualizationFrameworkUploadException("The file being uploaded : " + fileName.toString() + "  already exists.");
                 } else {
                     savedFilePath = fileManager.saveJarFile("", jarFile);
                 }
@@ -126,22 +147,107 @@ public class VisualizationFrameworkService {
                 frameworkList.forEach(framework -> framework.setFrameworkLocation(savedFilePath));
                 // set the framework in each of the methods as it is a bidirectional relationship
                 frameworkList.forEach(framework -> framework.getVisualizationMethods().forEach(method -> method.setVisualizationFramework(framework)));
-                visualizationFrameworkRepository.save(frameworkList);
 
+
+                //Validating all the values before starting to save in the database.
+                String validateFrameworkException = "";
+                for (VisualizationFramework framework : frameworkList) {
+                    VisualizationFramework availableFramework = visualizationFrameworkRepository.findByName(framework.getName());
+                    if(availableFramework != null)
+                        validateFrameworkException += ";The visualization Framework with name '" + framework.getName() + "'  already exists.";
+
+                    List<DataTransformerMethod> dataTransformerMethodList = new ArrayList<DataTransformerMethod>();
+
+                    for (VisualizationMethod method : framework.getVisualizationMethods()) {
+
+                        DataTransformerMethod newDataTransformer = new DataTransformerMethod();
+                        newDataTransformer.setName(method.getDataTransformerMethod().getName());
+                        newDataTransformer.setImplementingClass(method.getDataTransformerMethod().getImplementingClass());
+
+                        //Optional oldDataTransformer = dataTransformerMethodList.stream().filter(o -> o.getName().equals(newDataTransformer.getName()) && o.getImplementingClass().equals(newDataTransformer.getImplementingClass())).findFirst();
+                        Optional oldDataTransformer = dataTransformerMethodList.stream().filter(o -> o.getImplementingClass().equals(newDataTransformer.getImplementingClass())).findFirst();
+
+                        if (!oldDataTransformer.isPresent()) {
+                            DataTransformerMethod classDataTransformer = dataTransformerMethodRepository.findByImplementingClass(method.getDataTransformerMethod().getImplementingClass());
+                            if(classDataTransformer != null)
+                                validateFrameworkException += ";The Data Transformer with implementing class name '" + method.getDataTransformerMethod().getImplementingClass() + "'  already exists.";
+
+                        }
+
+                        VisualizationMethod classVisualizationMethod = visualizationMethodRepository.findByImplementingClass(method.getImplementingClass());
+                        if(classVisualizationMethod != null)
+                            validateFrameworkException += ";The Visualization Type with implementing class name '" + method.getImplementingClass() + "'  already exists.";
+                    }
+                }
+
+
+
+
+                //commenting out this line since it is not able to support new visualization framework which have multiple visualization methods using the same data transformer class
+                //visualizationFrameworkRepository.save(frameworkList);
+
+                if(validateFrameworkException == null || validateFrameworkException.isEmpty()) {
+                    //Manually saving the framework, related methods and data transformers
+                    for (VisualizationFramework framework : frameworkList) {
+                        VisualizationFramework newFramework = new VisualizationFramework();
+                        newFramework.setName(framework.getName());
+                        newFramework.setCreator(framework.getCreator());
+                        newFramework.setDescription(framework.getDescription());
+                        newFramework.setFrameworkLocation(framework.getFrameworkLocation());
+
+                        VisualizationFramework savedFramework = visualizationFrameworkRepository.save(newFramework);
+
+                        List<DataTransformerMethod> dataTransformerMethodList = new ArrayList<DataTransformerMethod>();
+
+                        for (VisualizationMethod method : framework.getVisualizationMethods()) {
+
+                            DataTransformerMethod newDataTransformer = new DataTransformerMethod();
+                            newDataTransformer.setName(method.getDataTransformerMethod().getName());
+                            newDataTransformer.setImplementingClass(method.getDataTransformerMethod().getImplementingClass());
+
+                            //Optional oldDataTransformer = dataTransformerMethodList.stream().filter(o -> o.getName().equals(newDataTransformer.getName()) && o.getImplementingClass().equals(newDataTransformer.getImplementingClass())).findFirst();
+                            Optional oldDataTransformer = dataTransformerMethodList.stream().filter(o -> o.getImplementingClass().equals(newDataTransformer.getImplementingClass())).findFirst();
+
+                            DataTransformerMethod savedDataTransformer;
+
+                            if (oldDataTransformer.isPresent()) {
+                                savedDataTransformer = (DataTransformerMethod) oldDataTransformer.get();
+                            } else {
+                                savedDataTransformer = dataTransformerMethodRepository.save(newDataTransformer);
+                                dataTransformerMethodList.add(savedDataTransformer);
+                            }
+
+                            VisualizationMethod newMethod = new VisualizationMethod();
+                            newMethod.setName(method.getName());
+                            newMethod.setImplementingClass(method.getImplementingClass());
+                            newMethod.setDataTransformerMethod(savedDataTransformer);
+                            newMethod.setVisualizationFramework(savedFramework);
+
+                            VisualizationMethod savedMethod = visualizationMethodRepository.save(newMethod);
+                        }
+                    }
+                }
+                else {
+                    if (fileManager.fileExists(fileName.toString()))
+                        fileManager.deleteJarFile(fileName.toString());
+                    throw new VisualizationFrameworkUploadException(validateFrameworkException.substring(1));
+                }
+
+                //TODO this needs to be fixed since its giving error
                 //third create the visualization suggestion entries for all the methods
                 //add the input datasets of the uploaded visualization code generators, for automatic suggestions
-                visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(jarFile.getInputStream());
+                VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(jarFile.getInputStream());
                 List<VisualizationSuggestion> visualizationSuggestions = new ArrayList<>();
-
+/*
                 frameworkList.forEach(framework -> {
                     framework.getVisualizationMethods().forEach(visualizationMethod -> {
                         try {
                             // serialize and de-serialize the DataSet to avoid the issue with the ClassCastException, because the VisualizationCodeGenerator is loaded in another class loader
-                            //and the OLAPDataSet in this piece code is loaded in another.
+                            //and the OpenLAPDataSet in this piece code is loaded in another.
                             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
-                            OLAPDataSet inputDataSet = null;
+                            OpenLAPDataSet inputDataSet = null;
                             try {
-                                inputDataSet = objectMapper.readValue(codeGenerator.getInputAsJsonString(), OLAPDataSet.class);
+                                inputDataSet = objectMapper.readValue(codeGenerator.getInputAsJsonString(), OpenLAPDataSet.class);
                             } catch (IOException ex) {
                                 log.error("Error in deserializing codegenerator input config.Not adding method:" + visualizationMethod.getName() + ", to suggestions", ex);
                             }
@@ -156,9 +262,9 @@ public class VisualizationFrameworkService {
                             log.error("Suggestion for method with id : " + visualizationMethod.getId() + " ,not added.", jsonProcessingException);
                         }
                     });
-                });
+                });*/
                 //save all the suggestions in the database
-                visualizationSuggestionRepository.save(visualizationSuggestions);
+                //visualizationSuggestionRepository.save(visualizationSuggestions);
             } catch (FileManagerException | IOException exception) {
                 throw new VisualizationFrameworkUploadException(exception.getMessage());
             }
@@ -317,18 +423,18 @@ public class VisualizationFrameworkService {
     }
 
     /**
-     * Validates the configuration of the VisualizationMethod (i.e. the inputs that it accepts) with the provided OLAPPortConfiguration.
+     * Validates the configuration of the VisualizationMethod (i.e. the inputs that it accepts) with the provided OpenLAPPortConfig.
      *
      * @param visualizationMethodId The id of the VisualizationMethod for which to validate the configuration
-     * @param olapPortConfiguration The OLAPPortConfiguration against which to validate the method configuration
+     * @param olapPortConfiguration The OpenLAPPortConfig against which to validate the method configuration
      * @return true if the the provided port configuration matches the configuration of the VisualizationMethod
      * @throws DataSetValidationException If the validation encountered an error
      */
-    public boolean validateVisualizationMethodConfiguration(long visualizationMethodId, OLAPPortConfiguration olapPortConfiguration) throws DataSetValidationException {
+    public boolean validateVisualizationMethodConfiguration(long visualizationMethodId, OpenLAPPortConfig olapPortConfiguration) throws DataSetValidationException {
         VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(visualizationMethodId);
         if (visualizationMethod != null) {
             //ask the factories for the instance
-            visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
+            VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
             VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
             return codeGenerator.isDataProcessable(olapPortConfiguration);
         } else {
@@ -349,21 +455,39 @@ public class VisualizationFrameworkService {
 
         VisualizationMethod visualizationMethod = visualizationMethodRepository.findOne(visualizationMethodId);
         //ask the factories for the instance
-        visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
+        VisualizationCodeGeneratorFactory visualizationCodeGeneratorFactory = new VisualizationCodeGeneratorFactoryImpl(visualizationMethod.getVisualizationFramework().getFrameworkLocation());
         VisualizationCodeGenerator codeGenerator = visualizationCodeGeneratorFactory.createVisualizationCodeGenerator(visualizationMethod.getImplementingClass());
         // serialize and de-serialize the DataSet to avoid the issue with the ClassCastException, because the VisualizationCodeGenerator is loaded in another class loader
-        //and the OLAPDataSet in this piece code is loaded in another.
-        OLAPDataSet inputDataSet = null;
-        OLAPDataSet outputDataSet = null;
+        //and the OpenLAPDataSet in this piece code is loaded in another.
+        OpenLAPDataSet inputDataSet = null;
+        OpenLAPDataSet outputDataSet = null;
         try {
-            inputDataSet = objectMapper.readValue(codeGenerator.getInputAsJsonString(), OLAPDataSet.class);
-            // outputDataSet = objectMapper.readValue(codeGenerator.getOutputAsJsonString(), OLAPDataSet.class);
-        } catch (IOException ex) {
+            inputDataSet = codeGenerator.getInput();
+            //inputDataSet = objectMapper.readValue(codeGenerator.getInputAsJsonString(), OpenLAPDataSet.class);
+            // outputDataSet = objectMapper.readValue(codeGenerator.getOutputAsJsonString(), OpenLAPDataSet.class);
+        } catch (Exception ex) {
             log.error("Error in deserializing codegenerator input/output config.", ex);
         }
         VisualizationMethodConfiguration visualizationMethodConfiguration = new VisualizationMethodConfiguration();
         visualizationMethodConfiguration.setInput(inputDataSet);
         visualizationMethodConfiguration.setOutput(outputDataSet);
         return visualizationMethodConfiguration;
+    }
+
+    public String encodeURIComponent(String component) {
+        String result = null;
+
+        try {
+            result = URLEncoder.encode(component, "UTF-8")
+                    .replaceAll("\\%28", "(")
+                    .replaceAll("\\%29", ")")
+                    .replaceAll("\\+", "%20")
+                    .replaceAll("\\%27", "'")
+                    .replaceAll("\\%21", "!")
+                    .replaceAll("\\%7E", "~");
+        } catch (UnsupportedEncodingException e) {
+            result = component;
+        }
+        return result;
     }
 }

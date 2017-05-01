@@ -1,8 +1,8 @@
 package de.rwthaachen.openlap.visualizer.core.dtos.request;
 
-import DataSet.OLAPDataSet;
-import DataSet.OLAPPortConfiguration;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.rwthaachen.openlap.dataset.OpenLAPDataSet;
+import de.rwthaachen.openlap.dataset.OpenLAPPortConfig;
 
 import java.util.Map;
 
@@ -13,17 +13,9 @@ public class GenerateVisualizationCodeRequest {
     private String methodName;
     private long frameworkId;
     private long methodId;
-    private OLAPDataSet dataSet;
-    private OLAPPortConfiguration portConfiguration;
+    private OpenLAPDataSet dataSet;
+    private OpenLAPPortConfig portConfiguration;
     private Map<String,Object> params;
-
-    public OLAPDataSet getDataSet() {
-        return dataSet;
-    }
-
-    public void setDataSet(OLAPDataSet dataSet) {
-        this.dataSet = dataSet;
-    }
 
     public String getFrameworkName() {
         return frameworkName;
@@ -57,17 +49,27 @@ public class GenerateVisualizationCodeRequest {
         this.methodId = methodId;
     }
 
-    public Map<String,Object> getAdditionalParameters() { return params; }
-
-    public void setAdditionalParameters(Map<String,Object> params) {
-        this.params = params;
+    public OpenLAPDataSet getDataSet() {
+        return dataSet;
     }
 
-    public OLAPPortConfiguration getPortConfiguration() {
+    public void setDataSet(OpenLAPDataSet dataSet) {
+        this.dataSet = dataSet;
+    }
+
+    public OpenLAPPortConfig getPortConfiguration() {
         return portConfiguration;
     }
 
-    public void setPortConfiguration(OLAPPortConfiguration portConfiguration) {
+    public void setPortConfiguration(OpenLAPPortConfig portConfiguration) {
         this.portConfiguration = portConfiguration;
+    }
+
+    public Map<String, Object> getParams() {
+        return params;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
     }
 }

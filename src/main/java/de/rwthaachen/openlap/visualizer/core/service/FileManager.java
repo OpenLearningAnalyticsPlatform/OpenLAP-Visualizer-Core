@@ -44,7 +44,7 @@ public class FileManager {
             // then generate one with the timestamp
             fileName = "jar_" + fileToSave.getName() + "_" + System.currentTimeMillis();
         }
-        fileName += configurationService.getJarBundleExtension(); //add the JAR extension
+        //fileName += configurationService.getJarBundleExtension(); //add the JAR extension
 
         try {
             Path fileStorageLocation = Paths.get(configurationService.getFileManagerStorageLocation());
@@ -88,11 +88,27 @@ public class FileManager {
     }
 
     /**
+     * Deletes a framework jar file from the system's storage
+     *
+     * @param fileToDelete The name of the file to delete
+     * @throws FileManagerException If the file could not be deleted
+     */
+    public void deleteJarFile(String fileToDelete) throws FileManagerException {
+        Path filePath = Paths.get(configurationService.getFileManagerStorageLocation(), fileToDelete);
+        try {
+            Files.delete(filePath);
+        } catch (IOException exception) {
+            throw new FileManagerException(exception.getMessage());
+        }
+    }
+
+    /**
      * Checks if a file already exists in the system's storage
      * @param fileName The name of the file to check
      * */
     public boolean fileExists(String fileName){
-        Path filePath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName+configurationService.getJarBundleExtension());
+        //Path filePath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName+configurationService.getJarBundleExtension());
+        Path filePath = Paths.get(configurationService.getFileManagerStorageLocation(), fileName);
         return Files.exists(filePath);
     }
 }

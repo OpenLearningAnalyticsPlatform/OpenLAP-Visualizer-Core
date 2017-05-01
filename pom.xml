@@ -21,11 +21,16 @@
         <version>1.2.7.RELEASE</version>
     </parent>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.OpenLearningAnalyticsPlatform</groupId>
-            <artifactId>OpenLAP-Dataset</artifactId>
-            <version>v1.2-alpha</version>
+            <artifactId>OpenLAP-DataSet</artifactId>
+            <version>v2.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -104,7 +109,7 @@
         <dependency>
             <groupId>com.github.OpenLearningAnalyticsPlatform</groupId>
             <artifactId>OpenLAP-Visualizer-Framework</artifactId>
-            <version>b2381d1b84</version>
+            <version>v2.3</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

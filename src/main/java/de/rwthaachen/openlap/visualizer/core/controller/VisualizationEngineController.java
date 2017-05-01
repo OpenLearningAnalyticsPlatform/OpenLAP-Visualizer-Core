@@ -31,11 +31,17 @@ public class VisualizationEngineController {
     public GenerateVisualizationCodeResponse generateVisualizationCode(@RequestBody GenerateVisualizationCodeRequest generateVisualizationCodeRequest) {
         GenerateVisualizationCodeResponse visualizationCodeResponse = new GenerateVisualizationCodeResponse();
         //check which service method to invoke
-        if (generateVisualizationCodeRequest.getFrameworkName() != null && !generateVisualizationCodeRequest.getFrameworkName().isEmpty()
-                && generateVisualizationCodeRequest.getMethodName() != null && !generateVisualizationCodeRequest.getMethodName().isEmpty())
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkName(), generateVisualizationCodeRequest.getMethodName(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getAdditionalParameters()));
+//        if (generateVisualizationCodeRequest.getFrameworkName() != null && !generateVisualizationCodeRequest.getFrameworkName().isEmpty()
+//                && generateVisualizationCodeRequest.getMethodName() != null && !generateVisualizationCodeRequest.getMethodName().isEmpty())
+//            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkName(), generateVisualizationCodeRequest.getMethodName(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getAdditionalParameters()));
+//        else
+//            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(), generateVisualizationCodeRequest.getMethodId(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getAdditionalParameters()));
+//        return visualizationCodeResponse;
+
+        if (generateVisualizationCodeRequest.getFrameworkId() < 1 && generateVisualizationCodeRequest.getMethodId() < 1)
+            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkName(), generateVisualizationCodeRequest.getMethodName(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getParams()));
         else
-            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(), generateVisualizationCodeRequest.getMethodId(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getAdditionalParameters()));
+            visualizationCodeResponse.setVisualizationCode(visualizationEngineService.generateClientVisualizationCode(generateVisualizationCodeRequest.getFrameworkId(), generateVisualizationCodeRequest.getMethodId(), generateVisualizationCodeRequest.getDataSet(),generateVisualizationCodeRequest.getPortConfiguration(), generateVisualizationCodeRequest.getParams()));
         return visualizationCodeResponse;
     }
 

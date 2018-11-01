@@ -30,6 +30,7 @@ public class VisualizationFramework {
     @Column(name = "VIS_FRAMEWORK_ID")
     private long id;
     @OneToMany(mappedBy = "visualizationFramework", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("name ASC")
     private List<VisualizationMethod> visualizationMethods;
 
     public VisualizationFramework() {

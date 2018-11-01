@@ -109,8 +109,6 @@ public class VisualizationFrameworkController {
     public ValidateVisualizationMethodConfigurationResponse validateMethodConfiguration(@PathVariable Long idOfFramework, @PathVariable Long idOfMethod, @RequestBody ValidateVisualizationMethodConfigurationRequest validateVisualizationMethodConfigurationRequest) {
         ValidateVisualizationMethodConfigurationResponse response = new ValidateVisualizationMethodConfigurationResponse();
         try {
-
-
             response.setConfigurationValid(visualizationFrameworkService.validateVisualizationMethodConfiguration(idOfMethod, validateVisualizationMethodConfigurationRequest.getConfigurationMapping()));
         } catch (DataSetValidationException exception) {
             response.setConfigurationValid(false);

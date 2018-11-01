@@ -78,7 +78,7 @@ public class VisualizationFrameworkService {
      */
     public List<VisualizationFramework> findAllVisualizationFrameworks() {
         List<VisualizationFramework> visualizationFrameworkList = new ArrayList<>();
-        visualizationFrameworkRepository.findAll().forEach(visualizationFrameworkList::add);
+        visualizationFrameworkRepository.findAllByOrderByNameAsc().forEach(visualizationFrameworkList::add);
         return visualizationFrameworkList;
     }
 
